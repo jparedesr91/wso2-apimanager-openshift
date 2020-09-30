@@ -1,0 +1,35 @@
+# Service wso2am-analytics-worker-service
+apiVersion: v1
+kind: Service
+metadata:
+  name: wso2am-analytics-worker-service
+spec:
+  type: ClusterIP
+  ports:
+    - name: thrift
+      port: 7612
+      protocol: TCP
+      targetPort: 7612
+    - name: thrift-ssl
+      port: 7712
+      protocol: TCP
+      targetPort: 7712
+    - name: rest-api-port-1
+      port: 9444
+      protocol: TCP
+      targetPort: 9444
+    - name: rest-api-port-2
+      port: 9091
+      protocol: TCP
+      targetPort: 9091
+    - name: rest-api-port-3
+      port: 7071
+      protocol: TCP
+      targetPort: 7071
+    - name: rest-api-port-4
+      port: 7444
+      protocol: TCP
+      targetPort: 7444
+  selector:
+    app-analytic: wso2am-analytics-worker
+    deploymentName: wso2am-analytics-worker

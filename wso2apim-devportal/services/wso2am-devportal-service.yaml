@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wso2apim-devportal-service
+  namespace : wso2apim
+spec:
+  # label keys and values that must match in order to receive traffic for this service
+  selector:
+    deploymentName: wso2apim-devportal
+  ports:
+  # ports that this service should serve on
+  - name: servlet-https
+    protocol: TCP
+    port: 9443

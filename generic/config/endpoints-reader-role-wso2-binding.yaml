@@ -1,0 +1,15 @@
+# RoleBinding endpoints-reader-role-wso2-binding
+apiVersion: authorization.openshift.io/v1
+groupNames: null
+kind: RoleBinding
+metadata:
+  name: endpoints-reader-role-wso2-binding
+roleRef:
+  name: endpoints-reader-role
+  namespace: wso2apim
+subjects:
+- kind: ServiceAccount
+  name: wso2am-svc-account
+  namespace: wso2apim
+userNames:
+- system:serviceaccount:wso2apim:wso2am-svc-account

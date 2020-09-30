@@ -1,0 +1,11 @@
+# ConfigMap wso2am-mysql-db-service-test
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wso2am-mysql-db-service-test
+  namespace: wso2apim
+data:
+  run.sh: |-
+    @test "Testing MySQL Connection" {
+      mysql --host=wso2am-mysql-db-service --port=3306 -u root -proot
+    }

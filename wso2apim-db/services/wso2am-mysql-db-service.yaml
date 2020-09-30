@@ -1,0 +1,14 @@
+# Service wso2am-mysql-db-service
+apiVersion: v1
+kind: Service
+metadata:
+  name: wso2am-mysql-db-service
+spec:
+  type: ClusterIP
+  ports:
+    - name: mysql
+      port: 3306
+      protocol: TCP
+      targetPort: mysql
+  selector:
+    app: wso2am-mysql-db-service

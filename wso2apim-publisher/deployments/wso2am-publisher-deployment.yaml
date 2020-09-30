@@ -1,0 +1,102 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: wso2apim-publisher-deployment
+  namespace: wso2apim
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      deployment: wso2apim-publisher
+  template:
+    metadata:      
+      labels:
+        deployment: wso2apim-publisher
+    spec:
+      initContainers:        
+        - name: init-apim-analytics
+          image: busybox:1.32
+          command: ['sh', '-c', 'echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z {{ template "am-pattern-3.resource.prefix" . }}-am-analytics-worker-service 7712; do sleep 1; printf "-"; done; echo -e "  >> WSO2 API Manager Analytics Worker has started";']
+        - name: init-km
+          image: busybox:1.32
+          command: ['sh', '-c', 'echo -e "Checking for the availability of Key Manager deployment"; while ! nc -z {{ template "am-pattern-3.resource.prefix" . }}-km-service 9443; do sleep 1; printf "-"; done; echo -e "  >> Key Manager has started";']
+      containers:
+        - name: wso2am-publisher          
+          image: docker.wso2.com/wso2am:3.1.0
+          imagePullPolicy: Always
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - nc -z localhost 9443
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - nc -z localhost 9443
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          lifecycle:
+            preStop:
+              exec:
+                command:  ['sh', '-c', '${WSO2_SERVER_HOME}/bin/wso2server.sh stop']
+          resources:
+            requests:
+              memory: 1Gi
+              cpu: 1000m
+            limits:
+              memory: 2Gi
+              cpu: 2000m
+          ports:
+            - containerPort: 9763
+              protocol: "TCP"
+            - containerPort: 9443
+              protocol: "TCP"
+          env:
+            - name: PROFILE_NAME
+              value: api-publisher
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: JVM_MEM_OPTS
+              value: "-Xms512m -Xmx512m"
+          securityContext:
+            runAsUser: 802
+          volumeMounts:
+          - name: wso2am-publisher-conf
+            mountPath: /home/wso2carbon/wso2-config-volume/repository/conf      
+          - name: wso2am-publisher-local-carbon-database-storage
+            mountPath: /home/wso2carbon/solr/database
+          - name: wso2am-publisher-indexed-data-volume
+            mountPath: /home/wso2carbon/solr/indexed-data
+          - name: wso2am-publisher-conf-entrypoint
+            mountPath: /home/wso2carbon/docker-entrypoint.sh
+            subPath: docker-entrypoint.sh            
+          - name: mysql-connector-jar
+            mountPath: /home/wso2carbon/wso2-artifact-volume/repository/components/dropins          
+      serviceAccountName: wso2am-svc-account     
+      imagePullSecrets:
+        - name: ""            
+      volumes:
+        - name: wso2am-publisher-conf
+          configMap:
+            name: wso2apim-publisher-conf        
+        - name: wso2am-publisher-conf-entrypoint
+          configMap:
+            name: wso2apim-publisher-conf-entrypoint
+            defaultMode: 0407
+        - name: wso2am-publisher-local-carbon-database-storage
+          persistentVolumeClaim:
+            claimName: wso2apim-publisher-1-local-carbon-database-volume-claim
+        - name: wso2am-publisher-indexed-data-volume
+          persistentVolumeClaim:
+            claimName: wso2apim-publisher-1-solr-indexed-data-volume-claim        
+        - name: mysql-connector-jar
+          emptyDir: {}        

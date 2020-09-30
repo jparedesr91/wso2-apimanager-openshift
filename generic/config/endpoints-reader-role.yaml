@@ -1,0 +1,13 @@
+# Role endpoints-reader-role
+apiVersion: authorization.openshift.io/v1
+kind: Role
+metadata:
+  name: endpoints-reader-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  verbs:
+  - get
+  - list

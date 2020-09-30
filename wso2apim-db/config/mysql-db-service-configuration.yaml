@@ -1,0 +1,10 @@
+# ConfigMap wso2am-mysql-db-service-configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wso2am-mysql-db-service-configuration
+  namespace: wso2apim
+data:
+  mysql.cnf: |-
+    [mysqld]
+    max_connections = 10000

@@ -1,0 +1,99 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: wso2apim-am-devportal-deployment
+  namespace: wso2apim
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      deployment: wso2apim-devportal
+  template:
+    metadata:     
+      labels:
+        deployment: wso2apim-devportal
+    spec:
+      initContainers:        
+        - name: init-apim-analytics
+          image: busybox:1.32
+          command: ['sh', '-c', 'echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z wso2apim-analytics-worker-service 7712; do sleep 1; printf "-"; done; echo -e "  >> WSO2 API Manager Analytics Worker has started";']
+        - name: init-km
+          image: busybox:1.32
+          command: ['sh', '-c', 'echo -e "Checking for the availability of Key Manager deployment"; while ! nc -z wso2apim-km-service 9443; do sleep 1; printf "-"; done; echo -e "  >> Key Manager has started";']
+      containers:
+        - name: wso2am-devportal          
+          image: docker.wso2.com/wso2am:3.1.0          
+          imagePullPolicy: Always
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - nc -z localhost 9443
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - nc -z localhost 9443
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          lifecycle:
+            preStop:
+              exec:
+                command: ['sh', '-c', '${WSO2_SERVER_HOME}/bin/wso2server.sh stop']
+          resources:
+            requests:
+              memory: 1Gi
+              cpu: 1000m
+            limits:
+              memory: 2Gi
+              cpu: 2000m
+          ports:
+            - containerPort: 9763
+              protocol: "TCP"
+            - containerPort: 9443
+              protocol: "TCP"
+          env:
+            - name: PROFILE_NAME
+              value: api-devportal
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: JVM_MEM_OPTS
+              value: "-Xms512m -Xmx512m"
+          securityContext:
+            runAsUser: 802
+          volumeMounts:
+          - name: wso2am-devportal-conf
+            mountPath: /home/wso2carbon/wso2-config-volume/repository/conf         
+          - name: wso2am-devportal-local-carbon-database-storage
+            mountPath: /home/wso2carbon/solr/database
+          - name: wso2am-devportal-indexed-data-volume
+            mountPath: /home/wso2carbon/solr/indexed-data
+          - name: wso2am-devportal-conf-entrypoint
+            mountPath: /home/wso2carbon/docker-entrypoint.sh
+            subPath: docker-entrypoint.sh         
+          
+      serviceAccountName: wso2am-svc-account
+      imagePullSecrets:
+        - name: ""
+      volumes:
+        - name: wso2am-devportal-conf
+          configMap:
+            name: wso2apim-am-devportal-conf        
+        - name: wso2am-devportal-conf-entrypoint
+          configMap:
+            name: wso2apim-am-devportal-conf-entrypoint
+            defaultMode: 0407
+        - name: wso2am-devportal-local-carbon-database-storage
+          persistentVolumeClaim:
+            claimName: wso2apim-am-devportal-1-local-carbon-database-volume-claim
+        - name: wso2am-devportal-indexed-data-volume
+          persistentVolumeClaim:
+            claimName: wso2apim-am-devportal-1-solr-indexed-data-volume-claim       

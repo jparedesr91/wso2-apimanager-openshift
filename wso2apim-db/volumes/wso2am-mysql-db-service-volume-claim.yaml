@@ -1,0 +1,11 @@
+# PersistentVolumeClaim wso2am-mysql-db-service-volume-claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wso2am-mysql-db-service
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi

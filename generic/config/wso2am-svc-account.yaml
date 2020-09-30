@@ -1,0 +1,5 @@
+# ServiceAccount wso2am-svc-account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: wso2am-svc-account

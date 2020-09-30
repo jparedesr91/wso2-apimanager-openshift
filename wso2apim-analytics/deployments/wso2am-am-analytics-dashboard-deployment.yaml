@@ -1,0 +1,113 @@
+# DeploymentConfig wso2am-am-analytics-dashboard-deployment
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: wso2am-am-analytics-dashboard-deployment
+spec:
+  replicas: 1
+  selector:
+      deploymentName: wso2am-analytics-dashboard
+  strategy:
+      type: Rolling
+  template:
+      metadata:
+        labels:
+          deploymentName: wso2am-analytics-dashboard
+      spec:
+        containers:
+          - image: 'wso2/wso2am-analytics-dashboard:3.1.0'
+            imagePullPolicy: IfNotPresent
+            lifecycle:
+              preStop:
+                exec:
+                  command:
+                    - sh
+                    - '-c'
+                    - '${WSO2_SERVER_HOME}/bin/dashboard.sh stop'
+            livenessProbe:
+              exec:
+                command:
+                  - /bin/sh
+                  - '-c'
+                  - nc -z localhost 9643
+              failureThreshold: 3
+              initialDelaySeconds: 20
+              periodSeconds: 10
+              successThreshold: 1
+              timeoutSeconds: 1
+            name: wso2am-analytics-dashboard
+            ports:
+              - containerPort: 9713
+                protocol: TCP
+              - containerPort: 9643
+                protocol: TCP
+              - containerPort: 9613
+                protocol: TCP
+              - containerPort: 7713
+                protocol: TCP
+              - containerPort: 9091
+                protocol: TCP
+              - containerPort: 7613
+                protocol: TCP
+            readinessProbe:
+              exec:
+                command:
+                  - /bin/sh
+                  - '-c'
+                  - nc -z localhost 9643
+              failureThreshold: 3
+              initialDelaySeconds: 20
+              periodSeconds: 10
+              successThreshold: 1
+              timeoutSeconds: 1
+            resources:
+              limits:
+                cpu: 2000m
+                memory: 4Gi
+              requests:
+                cpu: 2000m
+                memory: 4Gi
+            volumeMounts:
+              - mountPath: /home/wso2carbon/wso2-config-volume/conf/dashboard/deployment.yaml
+                name: wso2am-am-analytics-dashboard-conf
+                subPath: deployment.yaml
+              - mountPath: /home/wso2carbon/wso2-config-volume/wso2/dashboard/bin/carbon.sh
+                name: wso2am-am-analytics-dashboard-bin
+                subPath: carbon.sh
+              - mountPath: /home/wso2carbon/docker-entrypoint.sh
+                name: wso2am-am-analytics-dashboard-conf-entrypoint
+                subPath: docker-entrypoint.sh
+        imagePullSecrets:
+        - name: ${IMAGE_PULL_SECRET}
+        initContainers:
+          - command:
+              - sh
+              - '-c'
+              - >-
+                echo -e "Checking for the availability of MySQL Server
+                deployment"; while ! nc -z "wso2am-mysql-db-service" 3306; do
+                sleep 1; printf "-"; done; echo -e "  >> MySQL Server has
+                started";
+            image: 'busybox:1.31'
+            name: init-apim-analytics-db
+        restartPolicy: Always
+        securityContext:
+          runAsUser: 802
+        serviceAccount: wso2am-svc-account
+        serviceAccountName: wso2am-svc-account
+        terminationGracePeriodSeconds: 30
+        volumes:
+          - configMap:
+              defaultMode: 420
+              name: wso2am-am-analytics-dashboard-conf
+            name: wso2am-am-analytics-dashboard-conf
+          - configMap:
+              defaultMode: 263
+              name: wso2am-am-analytics-dashboard-bin
+            name: wso2am-am-analytics-dashboard-bin
+          - configMap:
+              defaultMode: 263
+              name: wso2am-am-analytics-dashboard-conf-entrypoint
+            name: wso2am-am-analytics-dashboard-conf-entrypoint
+  triggers:
+      - type: ConfigChange

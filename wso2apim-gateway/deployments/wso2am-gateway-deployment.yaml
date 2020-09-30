@@ -1,0 +1,127 @@
+# DeploymentConfig wso2am-gateway-deployment
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: wso2am-gateway-deployment
+spec:
+  replicas: 1
+  selector:
+      deploymentName: wso2am-gw
+      nodeName: wso2am-gw
+  strategy:
+      type: Rolling
+  template:
+      metadata:
+        labels:
+          deploymentName: wso2am-gw
+          nodeName: wso2am-gw
+      spec:
+        containers:
+          - env:
+              - name: HOST_NAME
+                value: wso2am-gw.wso2apim
+              - name: PROFILE_NAME
+                value: gateway-worker
+              - name: NODE_IP
+                valueFrom:
+                  fieldRef:
+                    apiVersion: v1
+                    fieldPath: status.podIP
+            image: 'wso2/wso2am:3.1.0'
+            lifecycle:
+              preStop:
+                exec:
+                  command:
+                    - sh
+                    - '-c'
+                    - '${WSO2_SERVER_HOME}/bin/wso2server.sh stop'
+            name: wso2am-gw
+            livenessProbe:
+              exec:
+                command:
+                  - /bin/sh
+                  - '-c'
+                  - nc -z localhost 9443
+              failureThreshold: 3
+              initialDelaySeconds: 60
+              periodSeconds: 10
+              successThreshold: 1
+              timeoutSeconds: 1
+            readinessProbe:
+              exec:
+                command:
+                - /bin/sh
+                - -c
+                - nc -z localhost 9443
+              failureThreshold: 3
+              initialDelaySeconds: 60
+              periodSeconds: 10
+              successThreshold: 1
+              timeoutSeconds: 1
+            ports:
+            - containerPort: 8243
+              protocol: TCP
+            - containerPort: 9443
+              protocol: TCP
+            - containerPort: 9099
+              protocol: TCP
+            resources:
+              limits:
+                cpu: 3000m
+                memory: 3Gi
+              requests:
+                cpu: 3000m
+                memory: 3Gi
+            volumeMounts:
+              - mountPath: /home/wso2carbon/wso2am-3.1.0-beta/repository/deployment/server/synapse-configs
+                name: wso2am-volume-claim-synapse-configs
+              - mountPath: /home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml
+                name: wso2am-gateway-conf
+                subPath: deployment.toml
+              - mountPath: /home/wso2carbon/docker-entrypoint.sh
+                name: wso2am-entrypoint
+                subPath: docker-entrypoint.sh
+        imagePullSecrets:
+        - name: ${IMAGE_PULL_SECRET}
+        initContainers:
+          - command:
+              - sh
+              - '-c'
+              - >-
+                echo -e "Checking for the availability of MySQL Server
+                deployment"; while ! nc -z "wso2am-mysql-db-service" 3306; do
+                sleep 1; printf "-"; done; echo -e "  >> MySQL Server has
+                started";
+            image: 'busybox:1.31'
+            imagePullPolicy: IfNotPresent
+            name: init-apim-tm-db
+          - command:
+              - sh
+              - '-c'
+              - >-
+                echo -e "Checking for the availability of WSO2 Traffic Manager
+                deployment"; while ! nc -z "wso2am-km-service" 9443; do
+                sleep 1; printf "-"; done; echo -e "  >> WSO2 Traffic Manager Server has
+                started";
+            image: 'busybox:1.31'
+            imagePullPolicy: IfNotPresent
+            name: init-apim-km
+        restartPolicy: Always
+        securityContext:
+          runAsUser: 802
+        serviceAccount: wso2am-svc-account
+        serviceAccountName: wso2am-svc-account
+        volumes:
+        - name: wso2am-volume-claim-synapse-configs
+          persistentVolumeClaim:
+            claimName: wso2am-volume-claim-synapse-configs
+        - configMap:
+            defaultMode: 420
+            name: wso2am-gateway-conf
+          name: wso2am-gateway-conf
+        - configMap:
+            defaultMode: 263
+            name: wso2am-entrypoint
+          name: wso2am-entrypoint
+  triggers:
+      - type: ConfigChange    

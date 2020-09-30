@@ -1,0 +1,10 @@
+# Secret wso2am-mysql-db-service
+apiVersion: v1
+kind: Secret
+metadata:
+ name: wso2am-mysql-db-service
+ namespace: wso2apim
+type: Opaque
+data:
+  mysql-password: d3NvMmNhcmJvbg==
+  mysql-root-password: cm9vdA==

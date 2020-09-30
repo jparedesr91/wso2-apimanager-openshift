@@ -1,0 +1,15 @@
+# SecurityContextConstraints wso2am-svc-account-security-context
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: wso2am-svc-account
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: RunAsAny
+supplementalGroups:
+  type: RunAsAny
+users:
+- system:serviceaccount:wso2apim:wso2am-svc-account
+volumes:
+- '*'

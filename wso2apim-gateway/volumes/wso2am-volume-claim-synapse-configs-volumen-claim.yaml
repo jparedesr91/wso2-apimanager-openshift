@@ -1,0 +1,11 @@
+# PersistentVolumeClaim wso2am-volume-claim-synapse-configs-volumen-claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wso2am-volume-claim-synapse-configs
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
