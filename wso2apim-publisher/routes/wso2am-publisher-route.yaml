@@ -1,0 +1,17 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: wso2apim-publisher-service
+  namespace : wso2apim
+spec:
+  tls:
+    - hosts:
+        - wso2am-publisher.wso2apim
+  rules:
+    - host: wso2am-publisher.wso2apim
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: wso2apim-publisher-service
+            servicePort: 9443

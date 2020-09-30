@@ -171,31 +171,75 @@ echoBold "Deployment of wso2am-gateway is happening in the backgroud please chec
 echoBold "After completion you can get the access details of the Server by navigating to Routes page in Openshift Console. "
 ####################### END SET wso2am-gateway DEPLOYMENT ############################
 
-####################### SET wso2am-am DEPLOYMENT  ############################
-echoBold 'Deploying wso2am-am'
+####################### SET wso2am-tm DEPLOYMENT  ############################
+echoBold 'Deploying wso2am-tm'
 
-echoBold 'Creating ConfigMaps for wso2am-am...'
-# create the wso2am-am ConfigMaps
-oc apply -f wso2apim-manager/config/wso2am-am-conf.yaml
+echoBold 'Creating ConfigMaps for wso2am-tm...'
+# create the wso2am-tm ConfigMaps
+oc apply -f wso2apim-tm/config/wso2apim-tm-conf-entrypoint.yaml
+oc apply -f wso2apim-tm/config/wso2apim-tm-conf.yaml
 
-echoBold 'Persisting VolumesClaim for wso2am-am...'
-# persistent volumeClaim wso2am-am
-oc apply -f wso2apim-manager/volumes/wso2am-instance-carbon-db-volume-clain.yaml
-oc apply -f wso2apim-manager/volumes/wso2am-instance-solr-volume-claim.yaml
-oc apply -f wso2apim-manager/volumes/wso2am-volume-claim-executionplans-volume-claim.yaml
+echoBold 'Persisting VolumesClaim for wso2am-tm...'
+# persistent volumeClaim wso2am-tm
+oc apply -f wso2apim-tm/volumes/wso2am-tm-volume-claim.yaml
 
-echoBold 'Deploying WSO2 wso2am-am...'
-# deploy deploymentConfig wso2am-am
-oc apply -f wso2apim-manager/deployments/wso2am-am-deployment.yaml
+echoBold 'Deploying WSO2 wso2am-tm...'
+# deploy deploymentConfig wso2am-tm
+oc apply -f wso2apim-tm/deployments/wso2am-tm-statefulset.yaml
 
-echoBold 'Creating the wso2am-am service...'
-# create the wso2am-am service
-oc apply -f wso2apim-manager/services/wso2am-am-service.yaml
+echoBold 'Creating the wso2am-tm service...'
+# create the wso2am-tm service
+oc apply -f wso2apim-tm/services/wso2am-tm-service.yaml
 
-echoBold 'Creating the wso2am-am route...'
-# create the wso2am-am route
-oc apply -f wso2apim-manager/routes/wso2am-am-service-route.yaml
-
-echoBold "Deployment of wso2am-am is happening in the backgroud please check the Openshift console for the status."
+echoBold "Deployment of wso2am-tm is happening in the backgroud please check the Openshift console for the status."
 echoBold "After completion you can get the access details of the Server by navigating to Routes page in Openshift Console. "
-####################### END SET wso2am-am DEPLOYMENT ############################
+####################### END SET wso2am-tm DEPLOYMENT ############################
+
+####################### SET wso2am-devportal DEPLOYMENT  ############################
+echoBold 'Deploying wso2am-devportal'
+
+echoBold 'Creating ConfigMaps for wso2am-devportal...'
+# create the wso2am-devportal-deployment ConfigMaps
+oc apply -f wso2apim-devportal/config/wso2am-devportal-conf-entrypoint.yaml
+oc apply -f wso2apim-devportal/config/wso2am-devportal-conf.yaml
+
+echoBold 'Persisting VolumesClaim for wso2am-devportal...'
+# persistent volumeClaim wso2am-devportal
+oc apply -f wso2apim-devportal/volumes/wso2am-devportal-volume-claims.yaml
+
+echoBold 'Deploying WSO2 wso2am-devportal...'
+# deploy deploymentConfig wso2am-devportal
+oc apply -f ../wso2apim-devportal/deployments/wso2am-devportal-deployment.yaml
+
+echoBold 'Creating the wso2am-devportal service...'
+# create the wso2am-devportal service
+oc apply -f wso2apim-devportal/services/wso2am-devportal-service.yaml
+
+echoBold "Deployment of wso2am-devportal is happening in the backgroud please check the Openshift console for the status."
+echoBold "After completion you can get the access details of the Server by navigating to Routes page in Openshift Console. "
+####################### END SET wso2am-devportal DEPLOYMENT ############################
+
+####################### SET wso2am-devportal DEPLOYMENT  ############################
+echoBold 'Deploying wso2am-devportal'
+
+echoBold 'Creating ConfigMaps for wso2am-publisher...'
+# create the wso2am-publisher-deployment ConfigMaps
+
+oc apply -f wso2apim-publisher/config/wso2am-publisher-conf-entrypoint.yaml
+oc apply -f wso2apim-publisher/config/wso2am-publisher-conf.yaml
+
+echoBold 'Persisting VolumesClaim for wso2am-publisher...'
+# persistent volumeClaim wso2am-publisher
+oc apply -f wso2apim-publisher/volumes/wso2am-publisher-volume-claims.yaml
+
+echoBold 'Deploying WSO2 wso2am-publisher...'
+# deploy deploymentConfig wso2am-publisher
+oc apply -f ../wso2apim-publisher/deployments/wso2am-publisher-deployment.yaml
+
+echoBold 'Creating the wso2am-devportal service...'
+# create the wso2am-publisher service
+oc apply -f wso2apim-publisher/services/wso2am-publisher-deployment.yaml
+
+echoBold "Deployment of wso2am-publisher is happening in the backgroud please check the Openshift console for the status."
+echoBold "After completion you can get the access details of the Server by navigating to Routes page in Openshift Console. "
+####################### END SET wso2am-devportal DEPLOYMENT ############################
