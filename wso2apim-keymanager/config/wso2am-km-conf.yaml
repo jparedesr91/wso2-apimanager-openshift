@@ -82,5 +82,5 @@ data:
       [apim.throttling]
 
       [[apim.throttling.url_group]]
-      traffic_manager_urls=["tcp://wso2am-am-service:9611"]
-      traffic_manager_auth_urls=["ssl://wso2am-am-service:9711"]
+      traffic_manager_urls=["tcp://wso2am-tm-service:9611"]
+      traffic_manager_auth_urls=["ssl://wso2am-tm-service:9711"]
