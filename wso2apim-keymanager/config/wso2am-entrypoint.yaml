@@ -87,7 +87,6 @@ data:
       test -d ${artifact_volume} && [ "$(ls -A ${artifact_volume})" ] && cp -RL
       ${artifact_volume}/* ${WSO2_SERVER_HOME}/
 
-
       if [ ! `test -d ${WSO2_SERVER_HOME}/updates/wum` ];
 
       then
@@ -95,7 +94,6 @@ data:
         # copy any patches mounted to patch_volume
         test -d ${patch_volume} && [ "$(ls -A ${patch_volume})" ] && cp -RL ${patch_volume}/* ${WSO2_SERVER_HOME}/
       fi
-
 
       # start WSO2 Carbon server
 
