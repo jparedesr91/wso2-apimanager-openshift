@@ -1,4 +1,3 @@
-
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -40,14 +39,7 @@ data:
         fi
       fi
     done
-
-    # Copying carbon_db
-    if ! test -f /home/wso2carbon/solr/database/WSO2CARBON_DB.mv.db
-    then
-      echo "Copying WSO2CARBON_DB.mv.db" >&2
-      cp ${WSO2_SERVER_HOME}/repository/database/WSO2CARBON_DB.mv.db /home/wso2carbon/solr/database/
-    fi
-
+  
     # optimize WSO2 Carbon Server, if the profile name is defined as an environment variable
     if [[ ! -z "${PROFILE_NAME}" ]]
     then

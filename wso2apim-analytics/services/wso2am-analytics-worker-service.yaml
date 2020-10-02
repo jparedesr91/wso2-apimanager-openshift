@@ -2,9 +2,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: wso2am-analytics-worker-service
+  name: wso2apim-analytics-worker-service
+  namespace: wso2apim
 spec:
-  type: ClusterIP
+  type: ClusterIP  
   ports:
     - name: thrift
       port: 7612
@@ -31,5 +32,6 @@ spec:
       protocol: TCP
       targetPort: 7444
   selector:
-    app-analytic: wso2am-analytics-worker
-    deploymentName: wso2am-analytics-worker
+    app-analytic: wso2apim-analytics-worker
+    deployment: wso2apim-analytics-worker
+    deploymentName: wso2apim-analytics-worker

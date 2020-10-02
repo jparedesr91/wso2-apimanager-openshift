@@ -6,7 +6,7 @@ metadata:
 data:
   deployment.toml: |-
     [server]
-    hostname = "wso2am-publisher-service"
+    hostname = "publisher.am.wso2.com"
     node_ip = "$env{NODE_IP}"
     server_role = "api-publisher"
 
@@ -52,8 +52,8 @@ data:
     service_url= "https://wso2apim-gateway-service:${mgt.transport.https.port}${carbon.context}services/"
     username= "${admin.username}"
     password= "${admin.password}"
-    http_endpoint = "http://wso2am-gateway.wso2apim"
-    https_endpoint = "https://wso2am-gateway.wso2apim"
+    http_endpoint = "http://gateway.am.wso2.com"
+    https_endpoint = "https://gateway.am.wso2.com"
 
 
     # key manager implementation
@@ -97,7 +97,7 @@ data:
     enable = true
 
     [apim.devportal]
-    url = "https://wso2am-devportal.wso2apim/devportal"
+    url = "https://devportal.am.wso2.com/devportal"
 
     [apim.workflow]
     enable = false
@@ -115,11 +115,11 @@ data:
     event_listening_endpoints = ["tcp://wso2apim-tm-service:5672","tcp://wso2apim-tm-service:5672"]
 
     [[apim.event_hub.publish.url_group]]
-    urls = ["tcp://wso2apim-tm-statefulset-0.wso2apim-tm-service:9611"]
+    urls = ["tcp://wso2apim-tm-service:9611"]
     auth_urls = ["ssl://wso2apim-tm-service:9711"]
 
     [[apim.event_hub.publish.url_group]]
-    urls = ["tcp://wso2apim-tm.wso2apim-tm-service:9611"]
+    urls = ["tcp://wso2apim-tm-service:9611"]
     auth_urls = ["ssl://wso2apim-tm-service:9711"]
 
     [transport.https.properties]

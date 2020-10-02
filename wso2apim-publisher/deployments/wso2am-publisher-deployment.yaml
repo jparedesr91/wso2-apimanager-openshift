@@ -6,33 +6,50 @@ metadata:
 spec:
   replicas: 1
   strategy:
-    type: Recreate
-  selector:
-    matchLabels:
+    type: Rolling
+  selector:    
       deployment: wso2apim-publisher
   template:
     metadata:      
       labels:
         deployment: wso2apim-publisher
     spec:
-      initContainers:        
-        - name: init-apim-analytics
+      initContainers:
+        - name: init-apim-db
           image: busybox:1.32
-          command: ['sh', '-c', 'echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z {{ template "am-pattern-3.resource.prefix" . }}-am-analytics-worker-service 7712; do sleep 1; printf "-"; done; echo -e "  >> WSO2 API Manager Analytics Worker has started";']
-        - name: init-km
+          imagePullPolicy: IfNotPresent
+          command: ['sh', '-c', 'echo -e "Checking for the availability of DBMS service"; while ! nc -z "wso2am-mysql-db-service" 3306; do sleep 1; printf "-"; done; echo -e "  >> DBMS service is available";']
+        - name: init-mysql-connector-download
           image: busybox:1.32
-          command: ['sh', '-c', 'echo -e "Checking for the availability of Key Manager deployment"; while ! nc -z {{ template "am-pattern-3.resource.prefix" . }}-km-service 9443; do sleep 1; printf "-"; done; echo -e "  >> Key Manager has started";']
+          command:
+            - /bin/sh
+            - "-c"
+            - |
+              set -e
+              connector_version=8.0.17
+              wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${connector_version}/mysql-connector-java-${connector_version}.jar -P /mysql-connector-jar/
+          volumeMounts:
+            - name: mysql-connector-jar
+              mountPath: /mysql-connector-jar        
+        #- name: init-apim-analytics
+          #image: 'busybox:1.32'
+          #imagePullPolicy: IfNotPresent
+          #command: ['sh', '-c', 'echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z {{ template "am-pattern-3.resource.prefix" . }}-am-analytics-worker-service 7712; do sleep 1; printf "-"; done; echo -e "  >> WSO2 API Manager Analytics Worker has started";']
+        #- name: init-km
+          #image: 'busybox:1.32'
+          #imagePullPolicy: IfNotPresent
+          #command: ['sh', '-c', 'echo -e "Checking for the availability of Key Manager deployment"; while ! nc -z {{ template "am-pattern-3.resource.prefix" . }}-km-service 9443; do sleep 1; printf "-"; done; echo -e "  >> Key Manager has started";']
       containers:
-        - name: wso2am-publisher          
-          image: docker.wso2.com/wso2am:3.1.0
-          imagePullPolicy: Always
+        - name: wso2apim-publisher          
+          image: 'wso2/wso2am:3.1.0'
+          imagePullPolicy: IfNotPresent
           livenessProbe:
             exec:
               command:
                 - /bin/sh
                 - -c
                 - nc -z localhost 9443
-            initialDelaySeconds: 60
+            initialDelaySeconds: 500
             periodSeconds: 10
           readinessProbe:
             exec:
@@ -40,7 +57,7 @@ spec:
                 - /bin/sh
                 - -c
                 - nc -z localhost 9443
-            initialDelaySeconds: 60
+            initialDelaySeconds: 500
             periodSeconds: 10
           lifecycle:
             preStop:
@@ -49,10 +66,10 @@ spec:
           resources:
             requests:
               memory: 1Gi
-              cpu: 1000m
+              cpu: 150m
             limits:
-              memory: 2Gi
-              cpu: 2000m
+              memory: 1Gi
+              cpu: 150m
           ports:
             - containerPort: 9763
               protocol: "TCP"
@@ -70,13 +87,13 @@ spec:
           securityContext:
             runAsUser: 802
           volumeMounts:
-          - name: wso2am-publisher-conf
+          - name: wso2apim-publisher-conf
             mountPath: /home/wso2carbon/wso2-config-volume/repository/conf      
-          - name: wso2am-publisher-local-carbon-database-storage
+          - name: wso2apim-publisher-local-carbon-database-storage
             mountPath: /home/wso2carbon/solr/database
-          - name: wso2am-publisher-indexed-data-volume
+          - name: wso2apim-publisher-indexed-data-volume
             mountPath: /home/wso2carbon/solr/indexed-data
-          - name: wso2am-publisher-conf-entrypoint
+          - name: wso2apim-publisher-conf-entrypoint
             mountPath: /home/wso2carbon/docker-entrypoint.sh
             subPath: docker-entrypoint.sh            
           - name: mysql-connector-jar
@@ -85,18 +102,18 @@ spec:
       imagePullSecrets:
         - name: ""            
       volumes:
-        - name: wso2am-publisher-conf
+        - name: wso2apim-publisher-conf
           configMap:
             name: wso2apim-publisher-conf        
-        - name: wso2am-publisher-conf-entrypoint
+        - name: wso2apim-publisher-conf-entrypoint
           configMap:
             name: wso2apim-publisher-conf-entrypoint
             defaultMode: 0407
-        - name: wso2am-publisher-local-carbon-database-storage
+        - name: wso2apim-publisher-local-carbon-database-storage
           persistentVolumeClaim:
-            claimName: wso2apim-publisher-1-local-carbon-database-volume-claim
-        - name: wso2am-publisher-indexed-data-volume
+            claimName: wso2apim-publisher-local-carbon-database-volume-claim
+        - name: wso2apim-publisher-indexed-data-volume
           persistentVolumeClaim:
-            claimName: wso2apim-publisher-1-solr-indexed-data-volume-claim        
+            claimName: wso2apim-publisher-solr-indexed-data-volume-claim        
         - name: mysql-connector-jar
           emptyDir: {}        

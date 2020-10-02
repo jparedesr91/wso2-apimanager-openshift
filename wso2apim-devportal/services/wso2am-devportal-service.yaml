@@ -6,7 +6,7 @@ metadata:
 spec:
   # label keys and values that must match in order to receive traffic for this service
   selector:
-    deploymentName: wso2apim-devportal
+    deployment: wso2apim-devportal
   ports:
   # ports that this service should serve on
   - name: servlet-https

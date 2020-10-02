@@ -1,39 +1,26 @@
-# Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-apiVersion: apps/v1
-kind: StatefulSet
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
 metadata:
-  name: wso2apim-tm-statefulset
-  namespace: wso2apim
+  name: wso2apim-tm-deployment  
 spec:
-  replicas: 2
+  replicas: 1
   selector:
-    matchLabels:
-      deployment: wso2apim-tm
-  serviceName: wso2apim-tm-service
+      deployment: wso2apim-tm      
+  strategy:
+      type: Rolling
   template:
     metadata:     
       labels:
-        deployment: wso2apim-tm
+        deployment: wso2apim-tm        
     spec:
       initContainers:        
         - name: init-apim-db
           image: busybox:1.32
+          imagePullPolicy: IfNotPresent
           command: ['sh', '-c', 'echo -e "Checking for the availability of DBMS service"; while ! nc -z "wso2am-mysql-db-service" 3306; do sleep 1; printf "-"; done; echo -e "  >> DBMS service is available";']
         - name: init-mysql-connector-download
           image: busybox:1.32
+          imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
             - "-c"
@@ -43,14 +30,11 @@ spec:
               wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${connector_version}/mysql-connector-java-${connector_version}.jar -P /mysql-connector-jar/
           volumeMounts:
             - name: mysql-connector-jar
-              mountPath: /mysql-connector-jar       
-        - name: init-km
-          image: busybox:1.32
-          command: ['sh', '-c', 'echo -e "Checking for the availability of Key Manager deployment"; while ! nc -z {{ template "am-pattern-3.resource.prefix" . }}-km-service 9443; do sleep 1; printf "-"; done; echo -e "  >> Key Manager has started";']
+              mountPath: /mysql-connector-jar               
       containers:
-        - name: wso2am-tm         
-          image: docker.wso2.com/wso2am:3.1.0
-          imagePullPolicy: ""
+        - name: wso2apim-tm         
+          image: wso2/wso2am:3.1.0
+          imagePullPolicy: IfNotPresent
           env:
             - name: PROFILE_NAME
               value: "traffic-manager"
@@ -66,7 +50,7 @@ spec:
                 - /bin/sh
                 - -c
                 - nc -z localhost 9611
-            initialDelaySeconds: 60
+            initialDelaySeconds: 300
             periodSeconds: 10
           readinessProbe:
             exec:
@@ -74,7 +58,7 @@ spec:
                 - /bin/sh
                 - -c
                 - nc -z localhost 9611
-            initialDelaySeconds: 60
+            initialDelaySeconds: 300
             periodSeconds: 10
           lifecycle:
             preStop:
@@ -82,10 +66,10 @@ spec:
                 command:  ['sh', '-c', '${WSO2_SERVER_HOME}/bin/wso2server.sh stop']
           resources:
             requests:
-              memory: 1Gi
+              memory: 3Gi
               cpu: 1000m
             limits:
-              memory: 1Gi
+              memory: 3Gi
               cpu: 1000m
           securityContext:
             runAsUser: 802
@@ -99,11 +83,11 @@ spec:
             - containerPort: 9443
               protocol: TCP
           volumeMounts:
-            - name: wso2am-tm-shared-storage-volume
+            - name: wso2apim-tm-shared-storage-volume
               mountPath: /home/wso2carbon/wso2am-3.1.0/repository/deployment/server/executionplans
-            - name: wso2am-tm-conf
+            - name: wso2apim-tm-conf
               mountPath: /home/wso2carbon/wso2-config-volume/repository/conf
-            - name: wso2am-tm-conf-entrypoint
+            - name: wso2apim-tm-conf-entrypoint
               mountPath: /home/wso2carbon/docker-entrypoint.sh
               subPath: docker-entrypoint.sh            
             - name: mysql-connector-jar
@@ -112,15 +96,17 @@ spec:
       imagePullSecrets:
         - name: ""
       volumes:
-        - name: wso2am-tm-shared-storage-volume
+        - name: wso2apim-tm-shared-storage-volume
           persistentVolumeClaim:
             claimName: wso2apim-tm-shared-executionplans-volume-claim
-        - name: wso2am-tm-conf
+        - name: wso2apim-tm-conf
           configMap:
             name: wso2apim-tm-conf
-        - name: wso2am-tm-conf-entrypoint
+        - name: wso2apim-tm-conf-entrypoint
           configMap:
             name: wso2apim-tm-conf-entrypoint
             defaultMode: 0407        
         - name: mysql-connector-jar
-          emptyDir: {}        
+          emptyDir: {}       
+  triggers:
+      - type: ConfigChange   

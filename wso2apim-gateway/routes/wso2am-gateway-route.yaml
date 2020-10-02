@@ -1,0 +1,16 @@
+# Route wso2am-gateway-service-route
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+    name: wso2apim-gateway-service
+    namespace: wso2apim
+spec:
+  host: gateway.am.wso2.com
+  port:
+    targetPort: pass-through-https
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: passthrough
+  to:
+    kind: Service
+    name: wso2apim-gateway-service

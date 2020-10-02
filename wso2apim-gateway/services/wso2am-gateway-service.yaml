@@ -2,14 +2,21 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: wso2am-gateway-service
-spec:
-  type: ClusterIP
+  name: wso2apim-gateway-service
+  namespace: wso2apim
+spec:  
   ports:
+    - name: pass-through-http
+      protocol: TCP
+      port: 8280
+      targetPort: 8280
     - name: pass-through-https
       port: 8243
       protocol: TCP
       targetPort: 8243
+    - name: servlet-http
+      protocol: TCP
+      port: 9763
     - name: servlet-https
       port: 9443
       protocol: TCP
@@ -19,4 +26,4 @@ spec:
       protocol: TCP
       targetPort: 9099
   selector:
-    deploymentName: wso2am-gw
+    deployment: wso2apim-gw

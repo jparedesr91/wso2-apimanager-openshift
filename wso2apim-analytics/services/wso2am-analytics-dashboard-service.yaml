@@ -1,0 +1,14 @@
+# Service wso2am-am-analytics-dashboard-service
+apiVersion: v1
+kind: Service
+metadata:
+  name: wso2apim-analytics-dashboard-service
+  namespace: wso2apim
+spec:  
+  selector:
+    deploymentName: wso2apim-analytics-dashboard-deployment-1
+  ports:
+    - name: analytics-dashboard
+      port: 9643
+      protocol: TCP
+      targetPort: 9643  

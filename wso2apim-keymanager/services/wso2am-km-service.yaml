@@ -2,13 +2,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: wso2am-km-service
-spec:
-  type: ClusterIP
+  name: wso2apim-km-service
+  namespace: wso2apim
+spec:  
   ports:
     - name: servlet-https
       port: 9443
       protocol: TCP
       targetPort: 9443
+  sessionAffinity: ClientIP    
   selector:
-    deploymentName: wso2am-km
+    deployment: wso2apim-km

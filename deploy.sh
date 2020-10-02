@@ -44,8 +44,8 @@ SCRIPT_WSO2AM_KM_DEPLOYMENT_PATH="../wso2apim-keymanager/scripts/deploy.sh"
 SCRIPT_WSO2AM_GATEWAY_PATH="../wso2apim-gateway/scripts/deploy.sh"
 SCRIPT_WWSO2AM_AM_PATH="../wso2apim-manager/scripts/deploy.sh"
 
-oc new-project $OPENSHIFT_PROJECT_NAME --description="Test Wso2 Api Manager Project for Ingoing Requests" --display-name="wso2-am"
-oc project $OPENSHIFT_PROJECT_NAME
+oc new-project wso2apim --description="Test Wso2 Api Manager Project for Ingoing Requests" --display-name="wso2-am"
+oc project wso2apim
 
 cd `dirname "$0"`
 # Functions
@@ -72,10 +72,6 @@ oc apply -f wso2apim-db/config/mysql-db-service-configuration.yaml
 oc apply -f wso2apim-db/config/wso2am-mysql-db-service-initialization.yaml
 oc apply -f wso2apim-db/config/wso2am-mysql-db-service-test.yaml
 oc apply -f wso2apim-db/config/wso2am-mysql-db-service.yaml
-
-echoBold 'Persisting Volumes for wso2am-mysql-db-service...'
-# persistent volumeClaim wso2am-mysql-db-service
-oc apply -f wso2apim-db/volumes/wso2am-mysql-db-service-volume.yaml
 
 echoBold 'Persisting VolumesClaim for wso2am-mysql-db-service...'
 # persistent volumeClaim wso2am-mysql-db-service
@@ -161,7 +157,7 @@ oc apply -f wso2apim-gateway/volumes/wso2am-volume-claim-synapse-configs-volumen
 
 echoBold 'Deploying WSO2 wso2am-gateway...'
 # deploy deploymentConfig wso2am-gateway
-oc apply -f ../wso2apim-gateway/deployments/wso2am-gateway-deployment.yaml
+oc apply -f wso2apim-gateway/deployments/wso2am-gateway-deployment.yaml
 
 echoBold 'Creating the wso2am-gateway service...'
 # create the wso2am-gateway service
@@ -176,8 +172,8 @@ echoBold 'Deploying wso2am-tm'
 
 echoBold 'Creating ConfigMaps for wso2am-tm...'
 # create the wso2am-tm ConfigMaps
-oc apply -f wso2apim-tm/config/wso2apim-tm-conf-entrypoint.yaml
-oc apply -f wso2apim-tm/config/wso2apim-tm-conf.yaml
+oc apply -f wso2apim-tm/config/wso2am-tm-conf-entrypoint.yaml
+oc apply -f wso2apim-tm/config/wso2am-tm-conf.yaml
 
 echoBold 'Persisting VolumesClaim for wso2am-tm...'
 # persistent volumeClaim wso2am-tm
@@ -185,7 +181,7 @@ oc apply -f wso2apim-tm/volumes/wso2am-tm-volume-claim.yaml
 
 echoBold 'Deploying WSO2 wso2am-tm...'
 # deploy deploymentConfig wso2am-tm
-oc apply -f wso2apim-tm/deployments/wso2am-tm-statefulset.yaml
+oc apply -f wso2apim-tm/deployments/wso2am-tm-deployment.yaml
 
 echoBold 'Creating the wso2am-tm service...'
 # create the wso2am-tm service
@@ -209,11 +205,15 @@ oc apply -f wso2apim-devportal/volumes/wso2am-devportal-volume-claims.yaml
 
 echoBold 'Deploying WSO2 wso2am-devportal...'
 # deploy deploymentConfig wso2am-devportal
-oc apply -f ../wso2apim-devportal/deployments/wso2am-devportal-deployment.yaml
+oc apply -f wso2apim-devportal/deployments/wso2am-devportal-deployment.yaml
 
 echoBold 'Creating the wso2am-devportal service...'
 # create the wso2am-devportal service
 oc apply -f wso2apim-devportal/services/wso2am-devportal-service.yaml
+
+echoBold 'Creating the wso2am-devportal routes...'
+# create the wso2am-devportal routes
+oc apply -f wso2apim-devportal/routes/wso2am-devportal-route.yaml
 
 echoBold "Deployment of wso2am-devportal is happening in the backgroud please check the Openshift console for the status."
 echoBold "After completion you can get the access details of the Server by navigating to Routes page in Openshift Console. "
@@ -234,7 +234,7 @@ oc apply -f wso2apim-publisher/volumes/wso2am-publisher-volume-claims.yaml
 
 echoBold 'Deploying WSO2 wso2am-publisher...'
 # deploy deploymentConfig wso2am-publisher
-oc apply -f ../wso2apim-publisher/deployments/wso2am-publisher-deployment.yaml
+oc apply -f wso2apim-publisher/deployments/wso2am-publisher-deployment.yaml
 
 echoBold 'Creating the wso2am-devportal service...'
 # create the wso2am-publisher service

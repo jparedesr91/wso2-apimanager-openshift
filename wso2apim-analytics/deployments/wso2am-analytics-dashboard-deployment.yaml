@@ -2,18 +2,22 @@
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
-  name: wso2am-am-analytics-dashboard-deployment
+  name: wso2apim-analytics-dashboard-deployment
+  namespace: wso2apim  
 spec:
   replicas: 1
   selector:
-      deploymentName: wso2am-analytics-dashboard
+      deployment: wso2apim-analytics-dashboard
   strategy:
       type: Rolling
   template:
       metadata:
         labels:
-          deploymentName: wso2am-analytics-dashboard
+          deployment: wso2apim-analytics-dashboard
       spec:
+        metadata:
+          labels:
+            deployment: wso2apim-analytics-dashboard
         containers:
           - image: 'wso2/wso2am-analytics-dashboard:3.1.0'
             imagePullPolicy: IfNotPresent
@@ -29,13 +33,13 @@ spec:
                 command:
                   - /bin/sh
                   - '-c'
-                  - nc -z localhost 9643
+                  - nc -z -v localhost 9643
               failureThreshold: 3
-              initialDelaySeconds: 20
-              periodSeconds: 10
+              initialDelaySeconds: 120
+              periodSeconds: 20
               successThreshold: 1
               timeoutSeconds: 1
-            name: wso2am-analytics-dashboard
+            name: wso2apim-analytics-dashboard
             ports:
               - containerPort: 9713
                 protocol: TCP
@@ -54,42 +58,46 @@ spec:
                 command:
                   - /bin/sh
                   - '-c'
-                  - nc -z localhost 9643
+                  - nc -z -v localhost 9643
               failureThreshold: 3
-              initialDelaySeconds: 20
-              periodSeconds: 10
+              initialDelaySeconds: 120
+              periodSeconds: 20
               successThreshold: 1
               timeoutSeconds: 1
             resources:
               limits:
-                cpu: 2000m
-                memory: 4Gi
+                cpu: 500m
+                memory: 1Gi
               requests:
-                cpu: 2000m
-                memory: 4Gi
+                cpu: 500m
+                memory: 1Gi
             volumeMounts:
               - mountPath: /home/wso2carbon/wso2-config-volume/conf/dashboard/deployment.yaml
-                name: wso2am-am-analytics-dashboard-conf
+                name: wso2apim-analytics-dashboard-conf
                 subPath: deployment.yaml
               - mountPath: /home/wso2carbon/wso2-config-volume/wso2/dashboard/bin/carbon.sh
-                name: wso2am-am-analytics-dashboard-bin
+                name: wso2apim-analytics-dashboard-bin
                 subPath: carbon.sh
-              - mountPath: /home/wso2carbon/docker-entrypoint.sh
-                name: wso2am-am-analytics-dashboard-conf-entrypoint
-                subPath: docker-entrypoint.sh
+              - name: mysql-connector-jar
+                mountPath: /home/wso2carbon/wso2-artifact-volume/lib              
         imagePullSecrets:
-        - name: ${IMAGE_PULL_SECRET}
+        - name: ""
         initContainers:
-          - command:
-              - sh
-              - '-c'
-              - >-
-                echo -e "Checking for the availability of MySQL Server
-                deployment"; while ! nc -z "wso2am-mysql-db-service" 3306; do
-                sleep 1; printf "-"; done; echo -e "  >> MySQL Server has
-                started";
-            image: 'busybox:1.31'
-            name: init-apim-analytics-db
+          - name: init-mysql-db
+            image: busybox:1.32
+            command: ['sh', '-c', 'echo -e "Checking for the availability of DBMS service"; while ! nc -z "wso2am-mysql-db-service" 3306; do sleep 1; printf "-"; done; echo -e "  >> DBMS service is available";']
+          - name: init-mysql-connector-download
+            image: busybox:1.32
+            command:
+             - /bin/sh
+             - "-c"
+             - |
+               set -e
+               connector_version=8.0.17
+               wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${connector_version}/mysql-connector-java-${connector_version}.jar -P /mysql-connector-jar/
+            volumeMounts:
+             - name: mysql-connector-jar
+               mountPath: /mysql-connector-jar
         restartPolicy: Always
         securityContext:
           runAsUser: 802
@@ -97,17 +105,13 @@ spec:
         serviceAccountName: wso2am-svc-account
         terminationGracePeriodSeconds: 30
         volumes:
-          - configMap:
-              defaultMode: 420
-              name: wso2am-am-analytics-dashboard-conf
-            name: wso2am-am-analytics-dashboard-conf
-          - configMap:
-              defaultMode: 263
-              name: wso2am-am-analytics-dashboard-bin
-            name: wso2am-am-analytics-dashboard-bin
-          - configMap:
-              defaultMode: 263
-              name: wso2am-am-analytics-dashboard-conf-entrypoint
-            name: wso2am-am-analytics-dashboard-conf-entrypoint
+          - configMap:             
+              name: wso2apim-analytics-dashboard-conf
+            name: wso2apim-analytics-dashboard-conf
+          - configMap:              
+              name: wso2apim-analytics-dashboard-bin
+            name: wso2apim-analytics-dashboard-bin          
+          - name: mysql-connector-jar
+            emptyDir: {}
   triggers:
       - type: ConfigChange

@@ -4,14 +4,13 @@ metadata:
   name: wso2apim-publisher-service
   namespace : wso2apim
 spec:
+  host: publisher.am.wso2.com
+  port:
+    targetPort: servlet-https
   tls:
-    - hosts:
-        - wso2am-publisher.wso2apim
-  rules:
-    - host: wso2am-publisher.wso2apim
-      http:
-        paths:
-        - path: /
-          backend:
-            serviceName: wso2apim-publisher-service
-            servicePort: 9443
+    insecureEdgeTerminationPolicy: Redirect
+    termination: passthrough
+  to:
+    kind: Service
+    name: wso2apim-devportal-service 
+

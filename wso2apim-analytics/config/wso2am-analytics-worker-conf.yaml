@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: wso2am-analytics-worker-conf
+  name: wso2apim-analytics-worker-conf
   namespace: wso2apim
 data:
   deployment.yaml: |-
@@ -531,9 +531,9 @@ data:
         eventByteBufferQueueCapacity: 20000
         byteBufferExtractorThreadPoolSize: 5
         eventSyncServer:
-          host: 0.0.0.0
+          host: ${NODE_IP}
           port: 9893
-          advertisedHost: wso2am-pattern-2-analytics-worker-2-service
+          advertisedHost: ${NODE_IP}  
           advertisedPort: 9893
           bossThreads: 10
           workerThreads: 10
@@ -543,3 +543,22 @@ data:
           maxIdle: 10
           maxWait: 60000
           minEvictableIdleTimeMillis: 120000
+
+    # Sample of deployment.config for Distributed deployment
+    #deployment.config:
+    #  type: distributed
+    #  httpsInterface:
+    #    host: 192.168.1.3
+    #    port: 9443
+    #    username: admin
+    #    password: admin
+    #  leaderRetryInterval: 10000
+    #  resourceManagers:
+    #    - host: 192.168.1.1
+    #      port: 9543
+    #      username: admin
+    #      password: admin
+    #    - host: 192.168.1.2
+    #      port: 9543
+    #      username: admin
+    #      password: admin

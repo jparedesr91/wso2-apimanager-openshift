@@ -2,24 +2,21 @@
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
-  name: wso2am-km-deployment
+  name: wso2apim-km-deployment
+  namespace: wso2apim
 spec:
   replicas: 1
   selector:
-      deploymentName: wso2am-km
-      nodeName: wso2am-km
+      deployment: wso2apim-km      
   strategy:
       type: Rolling
   template:
       metadata:
         labels:
-          deploymentName: wso2am-km
-          nodeName: wso2am-km
+          deployment: wso2apim-km          
       spec:
         containers:
-          - env:
-              - name: HOST_NAME
-                value: wso2am-km.wso2apim
+          - env:              
               - name: PROFILE_NAME
                 value: api-key-manager
               - name: NODE_IP
@@ -28,6 +25,7 @@ spec:
                     apiVersion: v1
                     fieldPath: status.podIP
             image: 'wso2/wso2am:3.1.0'
+            imagePullPolicy: IfNotPresent
             lifecycle:
               preStop:
                 exec:
@@ -35,16 +33,16 @@ spec:
                     - sh
                     - '-c'
                     - '${WSO2_SERVER_HOME}/bin/wso2server.sh stop'
-            name: wso2am-km
+            name: wso2apim-km
             livenessProbe:
               exec:
                 command:
                   - /bin/sh
                   - '-c'
                   - nc -z localhost 9443
-              failureThreshold: 3
-              initialDelaySeconds: 60
-              periodSeconds: 10
+              failureThreshold: 10
+              initialDelaySeconds: 120
+              periodSeconds: 60
               successThreshold: 1
               timeoutSeconds: 1
             readinessProbe:
@@ -53,9 +51,9 @@ spec:
                 - /bin/sh
                 - -c
                 - nc -z localhost 9443
-              failureThreshold: 3
-              initialDelaySeconds: 60
-              periodSeconds: 10
+              failureThreshold: 10
+              initialDelaySeconds: 120
+              periodSeconds: 60
               successThreshold: 1
               timeoutSeconds: 1
             ports:
@@ -67,56 +65,45 @@ spec:
                 protocol: TCP
             resources:
               limits:
-                cpu: 3000m
+                cpu: 1000m
                 memory: 3Gi
               requests:
-                cpu: 3000m
+                cpu: 1000m
                 memory: 3Gi
             volumeMounts:
               - mountPath: /home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml
-                name: wso2am-km-conf
+                name: wso2apim-km-conf
                 subPath: deployment.toml
-              - mountPath: /home/wso2carbon/docker-entrypoint.sh
-                name: wso2am-entrypoint
-                subPath: docker-entrypoint.sh
+              - name: mysql-connector-jar
+                mountPath: /home/wso2carbon/wso2-artifact-volume/repository/components/dropins             
         imagePullSecrets:
-        - name: ${IMAGE_PULL_SECRET}
+        - name: ""
         initContainers:
-          - command:
-              - sh
-              - '-c'
-              - >-
-                echo -e "Checking for the availability of MySQL Server
-                deployment"; while ! nc -z "wso2am-mysql-db-service" 3306; do
-                sleep 1; printf "-"; done; echo -e "  >> MySQL Server has
-                started";
-            image: 'busybox:1.31'
-            imagePullPolicy: IfNotPresent
-            name: init-apim-db
-          - command:
-              - sh
-              - '-c'
-              - >-
-                echo -e "Checking for the availability of WSO2 Traffic Manager
-                deployment"; while ! nc -z "wso2am-am-service" 9443; do
-                sleep 1; printf "-"; done; echo -e "  >> WSO2 Traffic Manager Server has
-                started";
-            image: 'busybox:1.31'
-            imagePullPolicy: IfNotPresent
-            name: init-apim-tm
+        - name: init-mysql-db
+          image: busybox:1.32
+          command: ['sh', '-c', 'echo -e "Checking for the availability of DBMS service"; while ! nc -z "wso2am-mysql-db-service" 3306; do sleep 1; printf "-"; done; echo -e "  >> MySQL Server has started";']
+        - name: init-mysql-connector-download
+          image: busybox:1.32
+          command:
+            - /bin/sh
+            - "-c"
+            - |
+              set -e
+              connector_version=8.0.17
+              wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${connector_version}/mysql-connector-java-${connector_version}.jar -P /mysql-connector-jar/
+          volumeMounts:
+            - name: mysql-connector-jar
+              mountPath: /mysql-connector-jar
         restartPolicy: Always
         securityContext:
           runAsUser: 802
         serviceAccount: wso2am-svc-account
         serviceAccountName: wso2am-svc-account
         volumes:
-        - configMap:
-            defaultMode: 420
-            name: wso2am-km-conf
-          name: wso2am-km-conf
-        - configMap:
-            defaultMode: 263
-            name: wso2am-entrypoint
-          name: wso2am-entrypoint
+        - configMap:            
+            name: wso2apim-km-conf
+          name: wso2apim-km-conf
+        - name: mysql-connector-jar            
+          emptyDir: {}           
   triggers:
       - type: ConfigChange

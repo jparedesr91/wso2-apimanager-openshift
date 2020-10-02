@@ -3,6 +3,7 @@ apiVersion: security.openshift.io/v1
 kind: SecurityContextConstraints
 metadata:
   name: wso2am-svc-account
+allowPrivilegedContainer: true  
 runAsUser:
   type: RunAsAny
 seLinuxContext:
@@ -10,6 +11,6 @@ seLinuxContext:
 supplementalGroups:
   type: RunAsAny
 users:
-- system:serviceaccount:wso2apim:wso2am-svc-account
+- system:wso2apim:wso2am-svc-account
 volumes:
 - '*'

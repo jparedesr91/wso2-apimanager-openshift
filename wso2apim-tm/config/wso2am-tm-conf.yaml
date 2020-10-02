@@ -54,4 +54,4 @@ data:
     enable_token_hashing = false
 
     [apim.throttling]
-    event_duplicate_url = ["tcp://{wso2apim-tm-service:5672"]  
+    event_duplicate_url = ["tcp://wso2apim-TM_INDEX-tm-service:5672"]      

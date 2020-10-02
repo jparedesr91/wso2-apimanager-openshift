@@ -2,24 +2,23 @@
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
-  name: wso2am-gateway-deployment
+  name: wso2apim-gateway-deployment
+  namespace: wso2apim
 spec:
   replicas: 1
   selector:
-      deploymentName: wso2am-gw
-      nodeName: wso2am-gw
+      deployment: wso2apim-gw      
   strategy:
       type: Rolling
   template:
       metadata:
         labels:
-          deploymentName: wso2am-gw
-          nodeName: wso2am-gw
+          deployment: wso2apim-gw
       spec:
         containers:
           - env:
               - name: HOST_NAME
-                value: wso2am-gw.wso2apim
+                value: gateway.am.wso2.com
               - name: PROFILE_NAME
                 value: gateway-worker
               - name: NODE_IP
@@ -28,6 +27,7 @@ spec:
                     apiVersion: v1
                     fieldPath: status.podIP
             image: 'wso2/wso2am:3.1.0'
+            imagePullPolicy: IfNotPresent
             lifecycle:
               preStop:
                 exec:
@@ -35,7 +35,7 @@ spec:
                     - sh
                     - '-c'
                     - '${WSO2_SERVER_HOME}/bin/wso2server.sh stop'
-            name: wso2am-gw
+            name: wso2apim-gw
             livenessProbe:
               exec:
                 command:
@@ -43,7 +43,7 @@ spec:
                   - '-c'
                   - nc -z localhost 9443
               failureThreshold: 3
-              initialDelaySeconds: 60
+              initialDelaySeconds: 300
               periodSeconds: 10
               successThreshold: 1
               timeoutSeconds: 1
@@ -54,7 +54,7 @@ spec:
                 - -c
                 - nc -z localhost 9443
               failureThreshold: 3
-              initialDelaySeconds: 60
+              initialDelaySeconds: 300
               periodSeconds: 10
               successThreshold: 1
               timeoutSeconds: 1
@@ -67,61 +67,43 @@ spec:
               protocol: TCP
             resources:
               limits:
-                cpu: 3000m
-                memory: 3Gi
+                cpu: 500m
+                memory: 2Gi
               requests:
-                cpu: 3000m
-                memory: 3Gi
+                cpu: 500m
+                memory: 2Gi
             volumeMounts:
               - mountPath: /home/wso2carbon/wso2am-3.1.0-beta/repository/deployment/server/synapse-configs
-                name: wso2am-volume-claim-synapse-configs
+                name: wso2apim-volume-claim-synapse-configs
               - mountPath: /home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml
-                name: wso2am-gateway-conf
-                subPath: deployment.toml
-              - mountPath: /home/wso2carbon/docker-entrypoint.sh
-                name: wso2am-entrypoint
-                subPath: docker-entrypoint.sh
+                name: wso2apim-gateway-conf
+                subPath: deployment.toml             
         imagePullSecrets:
-        - name: ${IMAGE_PULL_SECRET}
-        initContainers:
-          - command:
-              - sh
-              - '-c'
-              - >-
-                echo -e "Checking for the availability of MySQL Server
-                deployment"; while ! nc -z "wso2am-mysql-db-service" 3306; do
-                sleep 1; printf "-"; done; echo -e "  >> MySQL Server has
-                started";
-            image: 'busybox:1.31'
-            imagePullPolicy: IfNotPresent
-            name: init-apim-tm-db
-          - command:
-              - sh
-              - '-c'
-              - >-
-                echo -e "Checking for the availability of WSO2 Traffic Manager
-                deployment"; while ! nc -z "wso2am-km-service" 9443; do
-                sleep 1; printf "-"; done; echo -e "  >> WSO2 Traffic Manager Server has
-                started";
-            image: 'busybox:1.31'
-            imagePullPolicy: IfNotPresent
-            name: init-apim-km
+        - name: ""
+        #initContainers:                                 
+          #- name: init-apim-analytics
+            #image: busybox:1.32
+            #imagePullPolicy: IfNotPresent
+            #command: ['sh', '-c', 'echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z wso2apim-analytics-worker-service 7712; do sleep 1; printf "-"; done; echo -e "  >> WSO2 API Manager Analytics Worker has started";']
+          #- name: init-km
+            #image: busybox:1.32
+            #imagePullPolicy: IfNotPresent
+            #command: ['sh', '-c', 'echo -e "Checking for the availability of Key Manager deployment"; while ! nc -z wso2apim-km-service 9443; do sleep 1; printf "-"; done; echo -e "  >> Key Manager has started";']
+          #- name: init-tm
+            #image: busybox:1.32
+            #imagePullPolicy: IfNotPresent
+            #command: ['sh', '-c', 'echo -e "Checking for the availability of TM instance one deployment"; while ! nc -z wso2apim-tm-service 9611; do sleep 1; printf "-"; done; echo -e "  >> TM instance has started";']          
         restartPolicy: Always
         securityContext:
           runAsUser: 802
         serviceAccount: wso2am-svc-account
         serviceAccountName: wso2am-svc-account
         volumes:
-        - name: wso2am-volume-claim-synapse-configs
+        - name: wso2apim-volume-claim-synapse-configs
           persistentVolumeClaim:
-            claimName: wso2am-volume-claim-synapse-configs
-        - configMap:
-            defaultMode: 420
-            name: wso2am-gateway-conf
-          name: wso2am-gateway-conf
-        - configMap:
-            defaultMode: 263
-            name: wso2am-entrypoint
-          name: wso2am-entrypoint
+            claimName: wso2apim-volume-claim-synapse-configs
+        - configMap:            
+            name: wso2apim-gateway-conf
+          name: wso2apim-gateway-conf        
   triggers:
       - type: ConfigChange    

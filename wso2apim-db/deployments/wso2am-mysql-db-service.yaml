@@ -40,7 +40,7 @@ spec:
                   - '-c'
                   - 'mysqladmin ping -u root -p${MYSQL_ROOT_PASSWORD}'
               failureThreshold: 3
-              initialDelaySeconds: 30
+              initialDelaySeconds: 120
               periodSeconds: 10
               successThreshold: 1
               timeoutSeconds: 5
@@ -56,14 +56,14 @@ spec:
                   - '-c'
                   - 'mysqladmin ping -u root -p${MYSQL_ROOT_PASSWORD}'
               failureThreshold: 3
-              initialDelaySeconds: 5
+              initialDelaySeconds: 120
               periodSeconds: 10
               successThreshold: 1
               timeoutSeconds: 1
             resources:
               requests:
-                cpu: 100m
-                memory: 256Mi
+                cpu: 500m
+                memory: 1Gi
             volumeMounts:
               - mountPath: /var/lib/mysql
                 name: data
@@ -90,12 +90,10 @@ spec:
         restartPolicy: Always
         schedulerName: default-scheduler
         volumes:
-          - configMap:
-              defaultMode: 420
+          - configMap:              
               name: wso2am-mysql-db-service-configuration
             name: configurations
-          - configMap:
-              defaultMode: 420
+          - configMap:              
               name: wso2am-mysql-db-service-initialization
             name: migrations
           - name: data
