@@ -6,13 +6,13 @@ metadata:
 spec:
   replicas: 1
   strategy:
-    type: Rolling
+    type: Rolling  
   selector:    
-      deployment: wso2apim-publisher
+      deploymentName: wso2apim-publisher  
   template:
     metadata:      
       labels:
-        deployment: wso2apim-publisher
+        deploymentName: wso2apim-publisher
     spec:
       initContainers:
         - name: init-apim-db
@@ -30,15 +30,7 @@ spec:
               wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${connector_version}/mysql-connector-java-${connector_version}.jar -P /mysql-connector-jar/
           volumeMounts:
             - name: mysql-connector-jar
-              mountPath: /mysql-connector-jar        
-        #- name: init-apim-analytics
-          #image: 'busybox:1.32'
-          #imagePullPolicy: IfNotPresent
-          #command: ['sh', '-c', 'echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z {{ template "am-pattern-3.resource.prefix" . }}-am-analytics-worker-service 7712; do sleep 1; printf "-"; done; echo -e "  >> WSO2 API Manager Analytics Worker has started";']
-        #- name: init-km
-          #image: 'busybox:1.32'
-          #imagePullPolicy: IfNotPresent
-          #command: ['sh', '-c', 'echo -e "Checking for the availability of Key Manager deployment"; while ! nc -z {{ template "am-pattern-3.resource.prefix" . }}-km-service 9443; do sleep 1; printf "-"; done; echo -e "  >> Key Manager has started";']
+              mountPath: /mysql-connector-jar              
       containers:
         - name: wso2apim-publisher          
           image: 'wso2/wso2am:3.1.0'
@@ -48,7 +40,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - nc -z localhost 9443
+                - nc -z localhost 9444
             initialDelaySeconds: 500
             periodSeconds: 10
           readinessProbe:
@@ -56,7 +48,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - nc -z localhost 9443
+                - nc -z localhost 9444
             initialDelaySeconds: 500
             periodSeconds: 10
           lifecycle:
@@ -65,15 +57,15 @@ spec:
                 command:  ['sh', '-c', '${WSO2_SERVER_HOME}/bin/wso2server.sh stop']
           resources:
             requests:
-              memory: 1Gi
-              cpu: 150m
+              memory: 2Gi
+              cpu: 700m
             limits:
-              memory: 1Gi
-              cpu: 150m
+              memory: 2Gi
+              cpu: 700m
           ports:
-            - containerPort: 9763
+            - containerPort: 9764
               protocol: "TCP"
-            - containerPort: 9443
+            - containerPort: 9444
               protocol: "TCP"
           env:
             - name: PROFILE_NAME
@@ -89,10 +81,10 @@ spec:
           volumeMounts:
           - name: wso2apim-publisher-conf
             mountPath: /home/wso2carbon/wso2-config-volume/repository/conf      
-          - name: wso2apim-publisher-local-carbon-database-storage
-            mountPath: /home/wso2carbon/solr/database
-          - name: wso2apim-publisher-indexed-data-volume
-            mountPath: /home/wso2carbon/solr/indexed-data
+          # - name: wso2apim-publisher-local-carbon-database-storage
+          #   mountPath: /home/wso2carbon/solr/database
+          # - name: wso2apim-publisher-indexed-data-volume
+          #   mountPath: /home/wso2carbon/solr/indexed-data
           - name: wso2apim-publisher-conf-entrypoint
             mountPath: /home/wso2carbon/docker-entrypoint.sh
             subPath: docker-entrypoint.sh            
@@ -109,11 +101,11 @@ spec:
           configMap:
             name: wso2apim-publisher-conf-entrypoint
             defaultMode: 0407
-        - name: wso2apim-publisher-local-carbon-database-storage
-          persistentVolumeClaim:
-            claimName: wso2apim-publisher-local-carbon-database-volume-claim
-        - name: wso2apim-publisher-indexed-data-volume
-          persistentVolumeClaim:
-            claimName: wso2apim-publisher-solr-indexed-data-volume-claim        
+        # - name: wso2apim-publisher-local-carbon-database-storage
+        #   persistentVolumeClaim:
+        #     claimName: wso2apim-publisher-local-carbon-database-volume-claim
+        # - name: wso2apim-publisher-indexed-data-volume
+        #   persistentVolumeClaim:
+        #     claimName: wso2apim-publisher-solr-indexed-data-volume-claim        
         - name: mysql-connector-jar
           emptyDir: {}        

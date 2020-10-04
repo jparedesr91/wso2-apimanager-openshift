@@ -5,23 +5,24 @@ metadata:
   namespace: wso2apim
 spec:
   # label keys and values that must match in order to receive traffic for this service  
+  type: ClusterIP
   selector:
-    deployment: wso2apim-tm
+    deploymentName: wso2apim-tm-deployment
   ports:
     # ports that this service should serve on
     - name: binary
-      port: 9611
+      port: 9614
       protocol: TCP
-      targetPort: 9611
+      targetPort: 9614
     - name: binary-secure
-      port: 9711
+      port: 9714
       protocol: TCP
-      targetPort: 9711
+      targetPort: 9714
     - name: jms-tcp
-      port: 5672
+      port: 5675
       protocol: TCP
-      targetPort: 5672
+      targetPort: 5675
     - name: service
-      port: 9443
+      port: 9446
       protocol: TCP
-      targetPort: 9443
+      targetPort: 9446

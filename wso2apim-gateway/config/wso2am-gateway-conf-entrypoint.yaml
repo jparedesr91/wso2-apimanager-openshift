@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wso2apim-gateway-conf-entrypoint
+  namespace: wso2apim
+data:
+  docker-entrypoint.sh: |
+    #!/bin/bash
+    set -e
+
+      # check if the WSO2 non-root user home exists
+
+      test ! -d ${WORKING_DIRECTORY} && echo "WSO2 Docker non-root user home does not exist" && exit 1
+
+      # check if the WSO2 product home exists
+
+      test ! -d ${WSO2_SERVER_HOME} && echo "WSO2 Docker product home does not exist" && exit 1      
+
+      # Optimizing WSO2 Carbon Server
+
+      echo "Optimizing WSO2 Carbon Server" >&2
+
+      sh ${WSO2_SERVER_HOME}/bin/profileSetup.sh -Dprofile=${PROFILE_NAME}     
+
+      # start WSO2 Carbon server
+
+      echo "start WSO2 Carbon server" >&2
+
+      sh ${WSO2_SERVER_HOME}/bin/wso2server.sh -Dprofile=${PROFILE_NAME} "$@"

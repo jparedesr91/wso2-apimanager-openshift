@@ -1,0 +1,13 @@
+# Route wso2am-mysql-db-route
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: wso2am-mysql-db-service
+  namespace: wso2apim
+spec:
+  host: db.am.wso2.com
+  port:
+    targetPort: mysql
+  to:
+    kind: Service
+    name: wso2am-mysql-db-service                      

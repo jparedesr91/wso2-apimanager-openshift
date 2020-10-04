@@ -6,11 +6,11 @@ metadata:
 spec:
   host: publisher.am.wso2.com
   port:
-    targetPort: servlet-https
+    targetPort: 9444
   tls:
     insecureEdgeTerminationPolicy: Redirect
     termination: passthrough
   to:
     kind: Service
-    name: wso2apim-devportal-service 
+    name: wso2apim-publisher-service
 

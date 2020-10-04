@@ -7,18 +7,16 @@ metadata:
 spec:
   replicas: 1
   selector:
-      deployment: wso2apim-gw      
+      deploymentName: wso2apim-gateway      
   strategy:
       type: Rolling
   template:
       metadata:
         labels:
-          deployment: wso2apim-gw
+          deploymentName: wso2apim-gateway
       spec:
         containers:
           - env:
-              - name: HOST_NAME
-                value: gateway.am.wso2.com
               - name: PROFILE_NAME
                 value: gateway-worker
               - name: NODE_IP
@@ -41,9 +39,9 @@ spec:
                 command:
                   - /bin/sh
                   - '-c'
-                  - nc -z localhost 9443
+                  - nc -z localhost 9447
               failureThreshold: 3
-              initialDelaySeconds: 300
+              initialDelaySeconds: 500
               periodSeconds: 10
               successThreshold: 1
               timeoutSeconds: 1
@@ -52,56 +50,45 @@ spec:
                 command:
                 - /bin/sh
                 - -c
-                - nc -z localhost 9443
+                - nc -z localhost 9447
               failureThreshold: 3
-              initialDelaySeconds: 300
+              initialDelaySeconds: 500
               periodSeconds: 10
               successThreshold: 1
               timeoutSeconds: 1
             ports:
-            - containerPort: 8243
-              protocol: TCP
-            - containerPort: 9443
-              protocol: TCP
-            - containerPort: 9099
-              protocol: TCP
+              - containerPort: 8284
+                protocol: TCP
+              - containerPort: 8247
+                protocol: TCP
+              - containerPort: 9767
+                protocol: TCP
+              - containerPort: 9447
+                protocol: TCP
             resources:
               limits:
-                cpu: 500m
+                cpu: 400m
                 memory: 2Gi
               requests:
-                cpu: 500m
+                cpu: 400m
                 memory: 2Gi
             volumeMounts:
-              - mountPath: /home/wso2carbon/wso2am-3.1.0-beta/repository/deployment/server/synapse-configs
-                name: wso2apim-volume-claim-synapse-configs
+              # - mountPath: /home/wso2carbon/wso2-artifact-volume/repository/deployment/server/synapse-configs
+              #   name: wso2apim-volume-claim-synapse-configs
               - mountPath: /home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml
                 name: wso2apim-gateway-conf
                 subPath: deployment.toml             
         imagePullSecrets:
-        - name: ""
-        #initContainers:                                 
-          #- name: init-apim-analytics
-            #image: busybox:1.32
-            #imagePullPolicy: IfNotPresent
-            #command: ['sh', '-c', 'echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z wso2apim-analytics-worker-service 7712; do sleep 1; printf "-"; done; echo -e "  >> WSO2 API Manager Analytics Worker has started";']
-          #- name: init-km
-            #image: busybox:1.32
-            #imagePullPolicy: IfNotPresent
-            #command: ['sh', '-c', 'echo -e "Checking for the availability of Key Manager deployment"; while ! nc -z wso2apim-km-service 9443; do sleep 1; printf "-"; done; echo -e "  >> Key Manager has started";']
-          #- name: init-tm
-            #image: busybox:1.32
-            #imagePullPolicy: IfNotPresent
-            #command: ['sh', '-c', 'echo -e "Checking for the availability of TM instance one deployment"; while ! nc -z wso2apim-tm-service 9611; do sleep 1; printf "-"; done; echo -e "  >> TM instance has started";']          
+        - name: ""        
         restartPolicy: Always
         securityContext:
           runAsUser: 802
         serviceAccount: wso2am-svc-account
         serviceAccountName: wso2am-svc-account
         volumes:
-        - name: wso2apim-volume-claim-synapse-configs
-          persistentVolumeClaim:
-            claimName: wso2apim-volume-claim-synapse-configs
+        # - name: wso2apim-volume-claim-synapse-configs
+        #   persistentVolumeClaim:
+        #     claimName: wso2apim-volume-claim-synapse-configs
         - configMap:            
             name: wso2apim-gateway-conf
           name: wso2apim-gateway-conf        

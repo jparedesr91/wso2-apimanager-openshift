@@ -7,13 +7,14 @@ metadata:
 spec:
   replicas: 1
   selector:
-      deployment: wso2apim-km      
+      deploymentName: wso2apim-km-deployment
+  serviceName: wso2apim-km-service
   strategy:
       type: Rolling
   template:
-      metadata:
+      metadata:     
         labels:
-          deployment: wso2apim-km          
+          deploymentName: wso2apim-km-deployment
       spec:
         containers:
           - env:              
@@ -41,7 +42,7 @@ spec:
                   - '-c'
                   - nc -z localhost 9443
               failureThreshold: 10
-              initialDelaySeconds: 120
+              initialDelaySeconds: 300
               periodSeconds: 60
               successThreshold: 1
               timeoutSeconds: 1
@@ -52,7 +53,7 @@ spec:
                 - -c
                 - nc -z localhost 9443
               failureThreshold: 10
-              initialDelaySeconds: 120
+              initialDelaySeconds: 300
               periodSeconds: 60
               successThreshold: 1
               timeoutSeconds: 1
@@ -65,15 +66,18 @@ spec:
                 protocol: TCP
             resources:
               limits:
-                cpu: 1000m
-                memory: 3Gi
+                cpu: 700m
+                memory: 2Gi
               requests:
-                cpu: 1000m
-                memory: 3Gi
+                cpu: 700m
+                memory: 2Gi
             volumeMounts:
               - mountPath: /home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml
                 name: wso2apim-km-conf
                 subPath: deployment.toml
+              - name: wso2am-entrypoint
+                mountPath: /home/wso2carbon/docker-entrypoint.sh
+                subPath: docker-entrypoint.sh           
               - name: mysql-connector-jar
                 mountPath: /home/wso2carbon/wso2-artifact-volume/repository/components/dropins             
         imagePullSecrets:
@@ -102,7 +106,11 @@ spec:
         volumes:
         - configMap:            
             name: wso2apim-km-conf
-          name: wso2apim-km-conf
+          name: wso2apim-km-conf 
+        - name: wso2am-entrypoint
+          configMap:
+            name: wso2am-entrypoint
+            defaultMode: 0407                     
         - name: mysql-connector-jar            
           emptyDir: {}           
   triggers:

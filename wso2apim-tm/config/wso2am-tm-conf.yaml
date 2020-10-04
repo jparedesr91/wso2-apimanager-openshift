@@ -6,9 +6,10 @@ metadata:
 data:
   deployment.toml: |-
     [server]
-    #hostname = "wso2apim-tm"
+    hostname = "wso2apim-tm"
     node_ip = "$env{NODE_IP}"
     server_role = "traffic-manager"
+    offset=3
 
     [user_store]
     type = "database_unique_id"
@@ -52,6 +53,3 @@ data:
     revoke_endpoint = "https://wso2apim-km-service:9443/oauth2/revoke"
     enable_token_encryption = false
     enable_token_hashing = false
-
-    [apim.throttling]
-    event_duplicate_url = ["tcp://wso2apim-TM_INDEX-tm-service:5672"]      

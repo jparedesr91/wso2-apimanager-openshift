@@ -5,10 +5,12 @@ metadata:
   namespace : wso2apim
 spec:
   # label keys and values that must match in order to receive traffic for this service
+  type: ClusterIP
   selector:
-    deployment: wso2apim-publisher
+    deploymentName: wso2apim-publisher
   ports:
   # ports that this service should serve on
   - name: servlet-https
     protocol: TCP
-    port: 9443
+    port: 9444
+    targetPort: 9444  

@@ -4,14 +4,15 @@ metadata:
   name: wso2apim-tm-deployment  
 spec:
   replicas: 1
-  selector:
-      deployment: wso2apim-tm      
+  selector:      
+      deploymentName: wso2apim-tm-deployment    
+  serviceName: wso2apim-tm-service    
   strategy:
       type: Rolling
   template:
     metadata:     
       labels:
-        deployment: wso2apim-tm        
+        deploymentName: wso2apim-tm-deployment
     spec:
       initContainers:        
         - name: init-apim-db
@@ -32,7 +33,7 @@ spec:
             - name: mysql-connector-jar
               mountPath: /mysql-connector-jar               
       containers:
-        - name: wso2apim-tm         
+        - name: wso2apim-tm-deployment       
           image: wso2/wso2am:3.1.0
           imagePullPolicy: IfNotPresent
           env:
@@ -49,7 +50,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - nc -z localhost 9611
+                - nc -z localhost 9614
             initialDelaySeconds: 300
             periodSeconds: 10
           readinessProbe:
@@ -57,7 +58,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - nc -z localhost 9611
+                - nc -z localhost 9614
             initialDelaySeconds: 300
             periodSeconds: 10
           lifecycle:
@@ -66,21 +67,21 @@ spec:
                 command:  ['sh', '-c', '${WSO2_SERVER_HOME}/bin/wso2server.sh stop']
           resources:
             requests:
-              memory: 3Gi
-              cpu: 1000m
+              memory: 2Gi
+              cpu: 700m
             limits:
-              memory: 3Gi
-              cpu: 1000m
+              memory: 2Gi
+              cpu: 700m
           securityContext:
             runAsUser: 802
           ports:
-            - containerPort: 9611
+            - containerPort: 9614
+              protocol: TCP              
+            - containerPort: 9714
               protocol: TCP
-            - containerPort: 9711
+            - containerPort: 5675
               protocol: TCP
-            - containerPort: 5672
-              protocol: TCP
-            - containerPort: 9443
+            - containerPort: 9446
               protocol: TCP
           volumeMounts:
             - name: wso2apim-tm-shared-storage-volume
