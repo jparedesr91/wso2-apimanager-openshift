@@ -96,36 +96,6 @@ echoBold "Deployment of wso2am-mysql-db-service is happening in the backgroud pl
 echoBold "After completion you can get the access details of the Server by navigating to Routes page in Openshift Console. "
 ####################### END SET wso2am-mysql-db-service DEPLOYMENT ############################
 
-####################### SET wso2am-am-analytics-worker and wso2am-am-analytics-dashboard DEPLOYMENT  ############################
-echoBold 'Deploying wso2am-am-analytics-worker and wso2am-am-analytics-dashboard'
-
-echoBold 'Creating ConfigMaps for wso2am-am-analytics-worker and wso2am-am-analytics-dashboard...'
-# create the wso2am-am-analytics-worker and wso2am-am-analytics-dashboard ConfigMaps
-oc apply -f wso2apim-analytics/config/wso2am-am-analytics-dashboard-conf.yaml
-oc apply -f wso2apim-analytics/config/wso2am-am-analytics-dashboard-bin.yaml
-oc apply -f wso2apim-analytics/config/wso2am-am-analytics-dashboard-conf-entrypoint.yaml
-oc apply -f wso2apim-analytics/config/wso2am-analytics-worker-conf.yaml
-
-echoBold 'Persisting VolumesClaim for wso2am-am-analytics-worker and wso2am-am-analytics-dashboard...'
-# persistent volumeClaim wso2am-mysql-db-service
-
-echoBold 'Deploying WSO2 wso2am-am-analytics-worker and wso2am-am-analytics-dashboard...'
-# deploy deploymentConfig wso2am-am-analytics-worker and wso2am-am-analytics-dashboard
-oc apply -f wso2apim-analytics/deployments/wso2am-am-analytics-worker-deployment.yaml
-oc apply -f wso2apim-analytics/deployments/wso2am-am-analytics-dashboard-deployment.yaml
-
-echoBold 'Creating the wso2am-am-analytics-worker and wso2am-am-analytics-dashboard service...'
-# create the wso2am-am-analytics-worker and wso2am-am-analytics-dashboard
-oc apply -f wso2apim-analytics/services/wso2am-analytics-worker-service.yaml
-oc apply -f wso2apim-analytics/services/wso2am-am-analytics-dashboard-service.yaml
-
-echoBold 'Deploying Routes for API Manager, Gateway and Identity Server......'
-oc apply -f wso2apim-analytics/routes/wso2am-analytics-dashboard-route.yaml
-
-echoBold "Deployment of wso2am-am-analytics-worker and wso2am-am-analytics-dashboard is happening in the backgroud please check the Openshift console for the status."
-echoBold "After completion you can get the access details of the Server by navigating to Routes page in Openshift Console. "
-####################### END SET wso2am-mysql-db-service and wso2am-am-analytics-dashboard DEPLOYMENT ############################
-
 ####################### SET wso2am-km-deployment DEPLOYMENT  ############################
 echoBold 'Deploying wso2am-km-deployment'
 
