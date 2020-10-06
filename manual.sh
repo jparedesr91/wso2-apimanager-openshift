@@ -1,7 +1,7 @@
 oc new-project kcb-wso2apim --description="Test Wso2 Api Manager Project for Ingoing Requests" --display-name="kcb-wso2-am"
 oc project kcb-wso2apim
-oc adm policy add-scc-to-user privileged system:serviceaccount:kcb-wso2apim:wso2am-svc-account
-oc adm policy add-scc-to-user anyuid system:serviceaccount:kcb-wso2apim:wso2am-svc-account
+oc adm policy add-scc-to-user privileged system:serviceaccount:kcb-wso2apim:kcb-wso2am-svc-account
+oc adm policy add-scc-to-user anyuid system:serviceaccount:kcb-wso2apim:kcb-wso2am-svc-account
 
 oc apply -f generic/config/wso2am-svc-account.yaml
 oc apply -f generic/config/endpoints-reader-role.yaml

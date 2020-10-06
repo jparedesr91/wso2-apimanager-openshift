@@ -93,7 +93,7 @@ spec:
               connector_version=8.0.17
               wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${connector_version}/mysql-connector-java-${connector_version}.jar -P /mysql-connector-jar/
           volumeMounts:
-            - name: mysql-connector-jar
+            - name: kcb-mysql-connector-jar
               mountPath: /mysql-connector-jar
         serviceAccountName: kcb-wso2am-svc-account
         securityContext:

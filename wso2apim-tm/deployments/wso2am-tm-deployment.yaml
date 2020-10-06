@@ -18,7 +18,7 @@ spec:
         - name: init-apim-db
           image: busybox:1.32
           imagePullPolicy: IfNotPresent
-          command: ['sh', '-c', 'echo -e "Checking for the availability of DBMS service"; while ! nc -z "wso2am-mysql-db-service" 3306; do sleep 1; printf "-"; done; echo -e "  >> DBMS service is available";']
+          command: ['sh', '-c', 'echo -e "Checking for the availability of DBMS service"; while ! nc -z "kcb-wso2am-mysql-db-service" 3306; do sleep 1; printf "-"; done; echo -e "  >> DBMS service is available";']
         - name: init-mysql-connector-download
           image: busybox:1.32
           imagePullPolicy: IfNotPresent
