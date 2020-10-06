@@ -2,18 +2,18 @@
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
-  name: wso2apim-gateway-deployment
-  namespace: wso2apim
+  name: kcb-wso2apim-gateway-deployment
+  namespace: kcb-wso2apim
 spec:
   replicas: 1
   selector:
-      deploymentName: wso2apim-gateway      
+      deploymentName: kcb-wso2apim-gateway      
   strategy:
       type: Rolling
   template:
       metadata:
         labels:
-          deploymentName: wso2apim-gateway
+          deploymentName: kcb-wso2apim-gateway
       spec:
         containers:
           - env:
@@ -65,32 +65,32 @@ spec:
                 protocol: TCP
               - containerPort: 9447
                 protocol: TCP
-            resources:
-              limits:
-                cpu: 400m
-                memory: 2Gi
-              requests:
-                cpu: 400m
-                memory: 2Gi
+            # resources:
+            #   limits:
+            #     cpu: 400m
+            #     memory: 2Gi
+            #   requests:
+            #     cpu: 400m
+            #     memory: 2Gi
             volumeMounts:
               # - mountPath: /home/wso2carbon/wso2-artifact-volume/repository/deployment/server/synapse-configs
               #   name: wso2apim-volume-claim-synapse-configs
               - mountPath: /home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml
-                name: wso2apim-gateway-conf
+                name: kcb-wso2apim-gateway-conf
                 subPath: deployment.toml             
         imagePullSecrets:
         - name: ""        
         restartPolicy: Always
         securityContext:
           runAsUser: 802
-        serviceAccount: wso2am-svc-account
-        serviceAccountName: wso2am-svc-account
+        serviceAccount: kcb-wso2am-svc-account
+        serviceAccountName: kcb-wso2am-svc-account
         volumes:
         # - name: wso2apim-volume-claim-synapse-configs
         #   persistentVolumeClaim:
         #     claimName: wso2apim-volume-claim-synapse-configs
         - configMap:            
-            name: wso2apim-gateway-conf
-          name: wso2apim-gateway-conf        
+            name: kcb-wso2apim-gateway-conf
+          name: kcb-wso2apim-gateway-conf        
   triggers:
       - type: ConfigChange    

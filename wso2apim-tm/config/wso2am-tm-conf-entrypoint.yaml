@@ -34,26 +34,25 @@ data:
 
       # shared artifact directories
 
-      directories=["executionplans","synapse-configs"]
+      # directories=(executionplans synapse-configs)
 
-      # if the original directory locations of artifacts to be synced between nodes are empty,
+      # # if the original directory locations of artifacts to be synced between nodes are empty,
 
-      # copy the preserved, default content of these folders to these original locations
+      # # copy the preserved, default content of these folders to these original locations
 
-      for shared_directory
-      do
-        if test -d ${original_deployment_artifacts}/${shared_directory};
-        then
-          if [ -z "$(ls -A ${deployment_volume}/${shared_directory})" ]; then
-            if ! cp -R ${original_deployment_artifacts}/${shared_directory}/* ${deployment_volume}/${shared_directory};
-            then
-              echo "Failed to copy the preserved, default artifacts to original location (${deployment_volume}/${shared_directory})" >&2
-              exit 1
-            fi
-            echo "Successfully copied the preserved, default artifacts to original location (${deployment_volume}/${shared_directory})" >&2
-          fi
-        fi
-      done
+      # for shared_directory in ${directories[@]}; do
+      # if test -d ${original_deployment_artifacts}/${shared_directory};
+      # then
+      #   if [[ -z "$(ls -A ${deployment_volume}/${shared_directory})" ]]; then
+      #     if ! cp -R ${original_deployment_artifacts}/${shared_directory}/* ${deployment_volume}/${shared_directory};
+      #     then
+      #       echo "Failed to copy the preserved, default artifacts to original location (${deployment_volume}/${shared_directory})"
+      #       exit 1
+      #     fi
+      #     echo "Successfully copied the preserved, default artifacts to original location (${deployment_volume}/${shared_directory})"
+      #   fi
+      # fi
+      # done
 
       # Optimizing WSO2 Carbon Server
 

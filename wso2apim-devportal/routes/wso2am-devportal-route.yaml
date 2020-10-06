@@ -2,8 +2,8 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: wso2apim-devportal-service
-  namespace: wso2apim
+  name: kcb-wso2apim-devportal-service
+  namespace: kcb-wso2apim
 spec:
   host: devportal.am.wso2.com
   port:
@@ -13,4 +13,4 @@ spec:
     termination: passthrough
   to:
     kind: Service
-    name: wso2apim-devportal-service          
+    name: kcb-wso2apim-devportal-service          

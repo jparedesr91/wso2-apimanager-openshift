@@ -2,22 +2,22 @@
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
-  name: wso2apim-km-deployment
-  namespace: wso2apim
+  name: kcb-wso2apim-km-deployment
+  namespace: kcb-wso2apim
 spec:
-  replicas: 1
-  selector:
-      deploymentName: wso2apim-km-deployment
-  serviceName: wso2apim-km-service
+  selector:      
+      deploymentName: kcb-wso2apim-km-deployment        
+  replicas: 1  
   strategy:
       type: Rolling
   template:
       metadata:     
-        labels:
-          deploymentName: wso2apim-km-deployment
+        labels:         
+          deploymentName: kcb-wso2apim-km-deployment            
       spec:
         containers:
-          - env:              
+          - name: kcb-wso2apim-km-deployment
+            env:              
               - name: PROFILE_NAME
                 value: api-key-manager
               - name: NODE_IP
@@ -33,8 +33,7 @@ spec:
                   command:
                     - sh
                     - '-c'
-                    - '${WSO2_SERVER_HOME}/bin/wso2server.sh stop'
-            name: wso2apim-km
+                    - '${WSO2_SERVER_HOME}/bin/wso2server.sh stop'            
             livenessProbe:
               exec:
                 command:
@@ -64,28 +63,26 @@ spec:
                 protocol: TCP
               - containerPort: 9443
                 protocol: TCP
-            resources:
-              limits:
-                cpu: 700m
-                memory: 2Gi
-              requests:
-                cpu: 700m
-                memory: 2Gi
+            # resources:
+            #   limits:
+            #     cpu: 700m
+            #     memory: 2Gi
+            #   requests:
+            #     cpu: 700m
+            #     memory: 2Gi
             volumeMounts:
               - mountPath: /home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml
-                name: wso2apim-km-conf
+                name: kcb-wso2apim-km-conf
                 subPath: deployment.toml
-              - name: wso2am-entrypoint
-                mountPath: /home/wso2carbon/docker-entrypoint.sh
-                subPath: docker-entrypoint.sh           
-              - name: mysql-connector-jar
-                mountPath: /home/wso2carbon/wso2-artifact-volume/repository/components/dropins             
-        imagePullSecrets:
-        - name: ""
+              # - name: wso2am-entrypoint
+              #   mountPath: /home/wso2carbon/docker-entrypoint.sh
+              #   subPath: docker-entrypoint.sh           
+              - name: kcb-mysql-connector-jar
+                mountPath: /home/wso2carbon/wso2-artifact-volume/repository/components/dropins                             
         initContainers:
         - name: init-mysql-db
           image: busybox:1.32
-          command: ['sh', '-c', 'echo -e "Checking for the availability of DBMS service"; while ! nc -z "wso2am-mysql-db-service" 3306; do sleep 1; printf "-"; done; echo -e "  >> MySQL Server has started";']
+          command: ['sh', '-c', 'echo -e "Checking for the availability of DBMS service"; while ! nc -z "kcb-wso2am-mysql-db-service" 3306; do sleep 1; printf "-"; done; echo -e "  >> MySQL Server has started";']
         - name: init-mysql-connector-download
           image: busybox:1.32
           command:
@@ -98,20 +95,21 @@ spec:
           volumeMounts:
             - name: mysql-connector-jar
               mountPath: /mysql-connector-jar
-        restartPolicy: Always
+        serviceAccountName: kcb-wso2am-svc-account
         securityContext:
-          runAsUser: 802
-        serviceAccount: wso2am-svc-account
-        serviceAccountName: wso2am-svc-account
+          privileged: true              
+        restartPolicy: Always        
         volumes:
         - configMap:            
-            name: wso2apim-km-conf
-          name: wso2apim-km-conf 
-        - name: wso2am-entrypoint
-          configMap:
-            name: wso2am-entrypoint
-            defaultMode: 0407                     
-        - name: mysql-connector-jar            
+            name: kcb-wso2apim-km-conf
+          name: kcb-wso2apim-km-conf 
+        # - name: wso2am-entrypoint
+        #   configMap:
+        #     name: wso2am-entrypoint
+        #     defaultMode: 0407                     
+        - name: kcb-mysql-connector-jar            
           emptyDir: {}           
   triggers:
       - type: ConfigChange
+
+

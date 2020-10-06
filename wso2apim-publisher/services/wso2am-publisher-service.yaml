@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: wso2apim-publisher-service
-  namespace : wso2apim
+  name: kcb-wso2apim-publisher-service
+  namespace : kcb-wso2apim
 spec:
   # label keys and values that must match in order to receive traffic for this service
   type: ClusterIP
   selector:
-    deploymentName: wso2apim-publisher
+    deploymentName: kcb-wso2apim-publisher
   ports:
   # ports that this service should serve on
   - name: servlet-https

@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: wso2apim-tm-conf
-  namespace : wso2apim  
+  name: kcb-wso2apim-tm-conf
+  namespace : kcb-wso2apim  
 data:
   deployment.toml: |-
     [server]
@@ -21,14 +21,14 @@ data:
 
     [database.apim_db]
     type = "mysql"
-    url = "jdbc:mysql://wso2am-mysql-db-service:3306/WSO2AM_DB?useSSL=false&amp;autoReconnect=true&amp;requireSSL=false&amp;verifyServerCertificate=false"
+    url = "jdbc:mysql://kcb-wso2am-mysql-db-service:3306/WSO2AM_DB?useSSL=false&amp;autoReconnect=true&amp;requireSSL=false&amp;verifyServerCertificate=false"
     username = "wso2carbon"
     password = "wso2carbon"
     driver = "com.mysql.cj.jdbc.Driver"
 
     [database.shared_db]
     type = "mysql"
-    url = "jdbc:mysql://wso2am-mysql-db-service:3306/WSO2AM_SHARED_DB?useSSL=false&amp;autoReconnect=true&amp;requireSSL=false&amp;verifyServerCertificate=false"
+    url = "jdbc:mysql://kcb-wso2am-mysql-db-service:3306/WSO2AM_SHARED_DB?useSSL=false&amp;autoReconnect=true&amp;requireSSL=false&amp;verifyServerCertificate=false"
     username = "wso2carbon"
     password = "wso2carbon"
     driver = "com.mysql.cj.jdbc.Driver"
@@ -47,9 +47,9 @@ data:
 
     # key manager implementation
     [apim.key_manager]
-    service_url = "https://wso2apim-km-service:9443/services/"
+    service_url = "https://kcb-wso2apim-km-service:9443/services/"
 
     [apim.oauth_config]
-    revoke_endpoint = "https://wso2apim-km-service:9443/oauth2/revoke"
+    revoke_endpoint = "https://kcb-wso2apim-km-service:9443/oauth2/revoke"
     enable_token_encryption = false
     enable_token_hashing = false

@@ -2,20 +2,20 @@
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
-    name: wso2am-mysql-db-service
-    namespace: wso2apim
+    name: kcb-wso2am-mysql-db-service
+    namespace: kcb-wso2apim
 spec:
     replicas: 1
     selector:
-      app: wso2am-mysql-db-service
-      release: wso2am
+      app: kcb-wso2am-mysql-db-service
+      release: kcb-wso2am
     strategy:
       type: Rolling
     template:
       metadata:
         labels:
-          app: wso2am-mysql-db-service
-          release: wso2am
+          app: kcb-wso2am-mysql-db-service
+          release: kcb-wso2am
       spec:
         containers:
           - env:
@@ -23,12 +23,12 @@ spec:
                 valueFrom:
                   secretKeyRef:
                     key: mysql-root-password
-                    name: wso2am-mysql-db-service
+                    name: kcb-wso2am-mysql-db-service
               - name: MYSQL_PASSWORD
                 valueFrom:
                   secretKeyRef:
                     key: mysql-password
-                    name: wso2am-mysql-db-service
+                    name: kcb-wso2am-mysql-db-service
               - name: MYSQL_USER
                 value: wso2carbon
               - name: MYSQL_DATABASE
@@ -62,9 +62,9 @@ spec:
               successThreshold: 1
               timeoutSeconds: 1
             resources:
-              requests:
-                cpu: 500m
-                memory: 1Gi
+              # requests:
+              #   cpu: 500m
+              #   memory: 1Gi
             volumeMounts:
               - mountPath: /var/lib/mysql
                 name: data
@@ -92,13 +92,13 @@ spec:
         schedulerName: default-scheduler
         volumes:
           - configMap:              
-              name: wso2am-mysql-db-service-configuration
+              name: kcb-wso2am-mysql-db-service-configuration
             name: configurations
           - configMap:              
-              name: wso2am-mysql-db-service-initialization
+              name: kcb-wso2am-mysql-db-service-initialization
             name: migrations
           - name: data
             persistentVolumeClaim:
-              claimName: wso2am-mysql-db-service
+              claimName: kcb-wso2am-mysql-db-service
     triggers:
       - type: ConfigChange

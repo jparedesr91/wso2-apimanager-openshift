@@ -2,7 +2,8 @@
 apiVersion: authorization.openshift.io/v1
 kind: Role
 metadata:
-  name: endpoints-reader-role
+  name: kcb-endpoints-reader-role
+  namespace: kcb-wso2apim
 rules:
 - apiGroups:
   - ""

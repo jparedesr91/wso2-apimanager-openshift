@@ -2,22 +2,22 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: wso2apim-km-service
-  namespace: wso2apim  
+  name: kcb-wso2apim-km-service
+  namespace: kcb-wso2apim  
 spec:  
   type: ClusterIP
   ports:
-    - name: servlet-https1
+    - name: kcb-servlet-https1
       port: 8243
       protocol: TCP
       targetPort: 8243
-    - name: servlet-https2
+    - name: kcb-servlet-https2
       port: 9763
       protocol: TCP
       targetPort: 9763
-    - name: servlet-https3
+    - name: kcb-servlet-https3
       port: 9443
       protocol: TCP
       targetPort: 9443   
   selector:
-    deploymentName: wso2apim-km-deployment
+    deploymentName: kcb-wso2apim-km-deployment

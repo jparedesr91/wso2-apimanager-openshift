@@ -2,15 +2,19 @@
 apiVersion: security.openshift.io/v1
 kind: SecurityContextConstraints
 metadata:
-  name: wso2am-svc-account
+  name: kcb-wso2am-svc-account
+  namespace: kcb-wso2apim
 allowPrivilegedContainer: true  
+allowHostDirVolumePlugin: true
 runAsUser:
   type: RunAsAny
 seLinuxContext:
   type: RunAsAny
 supplementalGroups:
   type: RunAsAny
+fsGroup:
+  type: RunAsAny
 users:
-- system:wso2apim:wso2am-svc-account
+- system:kcb-wso2apim:kcb-wso2am-svc-account
 volumes:
 - '*'

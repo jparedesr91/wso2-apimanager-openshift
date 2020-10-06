@@ -2,15 +2,15 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-    name: wso2apim-gateway-service
-    namespace: wso2apim
+    name: kcb-wso2apim-gateway-service
+    namespace: kcb-wso2apim
 spec:
   host: gateway.am.wso2.com
   port:
-    targetPort: pass-through-https
+    targetPort: kcb-pass-through-https
   tls:
     insecureEdgeTerminationPolicy: Redirect
     termination: passthrough
   to:
     kind: Service
-    name: wso2apim-gateway-service
+    name: kcb-wso2apim-gateway-service

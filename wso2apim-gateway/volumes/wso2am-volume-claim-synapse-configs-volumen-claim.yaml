@@ -2,8 +2,8 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: wso2apim-volume-claim-synapse-configs
-  namespace: wso2apim
+  name: kcb-wso2apim-volume-claim-synapse-configs
+  namespace: kcb-wso2apim
 spec:
   accessModes:
   - ReadWriteMany

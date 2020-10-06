@@ -1,18 +1,18 @@
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
-  name: wso2apim-tm-deployment  
+  name: kcb-wso2apim-tm-deployment
+  namespace: kcb-wso2apim
 spec:
   replicas: 1
   selector:      
-      deploymentName: wso2apim-tm-deployment    
-  serviceName: wso2apim-tm-service    
+      deploymentName: kcb-wso2apim-tm-deployment      
   strategy:
       type: Rolling
   template:
     metadata:     
       labels:
-        deploymentName: wso2apim-tm-deployment
+        deploymentName: kcb-wso2apim-tm-deployment
     spec:
       initContainers:        
         - name: init-apim-db
@@ -30,10 +30,10 @@ spec:
               connector_version=8.0.17
               wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${connector_version}/mysql-connector-java-${connector_version}.jar -P /mysql-connector-jar/
           volumeMounts:
-            - name: mysql-connector-jar
+            - name: kcb-mysql-connector-jar
               mountPath: /mysql-connector-jar               
       containers:
-        - name: wso2apim-tm-deployment       
+        - name: kcb-wso2apim-tm-deployment       
           image: wso2/wso2am:3.1.0
           imagePullPolicy: IfNotPresent
           env:
@@ -66,12 +66,12 @@ spec:
               exec:
                 command:  ['sh', '-c', '${WSO2_SERVER_HOME}/bin/wso2server.sh stop']
           resources:
-            requests:
-              memory: 2Gi
-              cpu: 700m
-            limits:
-              memory: 2Gi
-              cpu: 700m
+            # requests:
+            #   memory: 2Gi
+            #   cpu: 700m
+            # limits:
+            #   memory: 2Gi
+            #   cpu: 700m
           securityContext:
             runAsUser: 802
           ports:
@@ -84,30 +84,30 @@ spec:
             - containerPort: 9446
               protocol: TCP
           volumeMounts:
-            - name: wso2apim-tm-shared-storage-volume
+            - name: kcb-wso2apim-tm-shared-storage-volume
               mountPath: /home/wso2carbon/wso2am-3.1.0/repository/deployment/server/executionplans
-            - name: wso2apim-tm-conf
+            - name: kcb-wso2apim-tm-conf
               mountPath: /home/wso2carbon/wso2-config-volume/repository/conf
-            - name: wso2apim-tm-conf-entrypoint
+            - name: kcb-wso2apim-tm-conf-entrypoint
               mountPath: /home/wso2carbon/docker-entrypoint.sh
               subPath: docker-entrypoint.sh            
-            - name: mysql-connector-jar
+            - name: kcb-mysql-connector-jar
               mountPath: /home/wso2carbon/wso2-artifact-volume/repository/components/dropins           
       serviceAccountName: wso2am-svc-account     
       imagePullSecrets:
         - name: ""
       volumes:
-        - name: wso2apim-tm-shared-storage-volume
+        - name: kcb-wso2apim-tm-shared-storage-volume
           persistentVolumeClaim:
-            claimName: wso2apim-tm-shared-executionplans-volume-claim
-        - name: wso2apim-tm-conf
+            claimName: kcb-wso2apim-tm-shared-executionplans-volume-claim
+        - name: kcb-wso2apim-tm-conf
           configMap:
-            name: wso2apim-tm-conf
-        - name: wso2apim-tm-conf-entrypoint
+            name: kcb-wso2apim-tm-conf
+        - name: kcb-wso2apim-tm-conf-entrypoint
           configMap:
-            name: wso2apim-tm-conf-entrypoint
+            name: kcb-wso2apim-tm-conf-entrypoint
             defaultMode: 0407        
-        - name: mysql-connector-jar
+        - name: kcb-mysql-connector-jar
           emptyDir: {}       
   triggers:
       - type: ConfigChange   

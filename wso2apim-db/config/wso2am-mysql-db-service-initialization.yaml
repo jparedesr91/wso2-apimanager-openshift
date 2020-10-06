@@ -2,8 +2,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: wso2am-mysql-db-service-initialization
-  namespace: wso2apim
+  name: kcb-wso2am-mysql-db-service-initialization
+  namespace: kcb-wso2apim
 data:
   #  mysql_analytics.sql: |-
   #    DROP DATABASE IF EXISTS WSO2AM_STATS_DB;

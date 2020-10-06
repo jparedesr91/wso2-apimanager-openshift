@@ -1,28 +1,28 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: wso2apim-tm-service
-  namespace: wso2apim
+  name: kcb-wso2apim-tm-service
+  namespace: kcb-wso2apim
 spec:
   # label keys and values that must match in order to receive traffic for this service  
   type: ClusterIP
   selector:
-    deploymentName: wso2apim-tm-deployment
+    deploymentName: kcb-wso2apim-tm-deployment
   ports:
     # ports that this service should serve on
-    - name: binary
+    - name: kcb-binary
       port: 9614
       protocol: TCP
       targetPort: 9614
-    - name: binary-secure
+    - name: kcb-binary-secure
       port: 9714
       protocol: TCP
       targetPort: 9714
-    - name: jms-tcp
+    - name: kcb-jms-tcp
       port: 5675
       protocol: TCP
       targetPort: 5675
-    - name: service
+    - name: kcb-service
       port: 9446
       protocol: TCP
       targetPort: 9446

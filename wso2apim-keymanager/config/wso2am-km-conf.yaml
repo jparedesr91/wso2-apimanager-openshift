@@ -2,8 +2,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-   name: wso2apim-km-conf
-   namespace: wso2apim
+   name: kcb-wso2apim-km-conf
+   namespace: kcb-wso2apim
 data:
    deployment.toml: |-
       [server]
@@ -22,14 +22,14 @@ data:
 
       [database.apim_db]
       type = "mysql"
-      url = "jdbc:mysql://wso2am-mysql-db-service:3306/WSO2AM_DB?useSSL=false&amp;autoReconnect=true&amp;requireSSL=false&amp;verifyServerCertificate=false"
+      url = "jdbc:mysql://kcb-wso2am-mysql-db-service:3306/WSO2AM_DB?useSSL=false&amp;autoReconnect=true&amp;requireSSL=false&amp;verifyServerCertificate=false"
       username = "wso2carbon"
       password = "wso2carbon"
       driver = "com.mysql.cj.jdbc.Driver"
 
       [database.shared_db]
       type = "mysql"
-      url = "jdbc:mysql://wso2am-mysql-db-service:3306/WSO2AM_SHARED_DB?useSSL=false&amp;autoReconnect=true&amp;requireSSL=false&amp;verifyServerCertificate=false"
+      url = "jdbc:mysql://kcb-wso2am-mysql-db-service:3306/WSO2AM_SHARED_DB?useSSL=false&amp;autoReconnect=true&amp;requireSSL=false&amp;verifyServerCertificate=false"
       username = "wso2carbon"
       password = "wso2carbon"
       driver = "com.mysql.cj.jdbc.Driver"
@@ -57,7 +57,7 @@ data:
       order = 1
 
       [event_listener.properties]
-      notification_endpoint = "https://wso2am-tm-service:9446/internal/data/v1/notify"
+      notification_endpoint = "https://kcb-wso2am-tm-service:9446/internal/data/v1/notify"
       username= "$ref{super_admin.username}"
       password= "$ref{super_admin.password}"
       'header.X-WSO2-KEY-MANAGER' = "default"      
@@ -66,8 +66,8 @@ data:
       [apim.throttling]
       username= "$ref{super_admin.username}"
       password= "$ref{super_admin.password}"
-      throttle_decision_endpoints = ["tcp://localhost:5675"]
+      throttle_decision_endpoints = ["tcp://kcb-wso2am-tm-service:5675"]
 
       [[apim.throttling.url_group]]
-      traffic_manager_urls = ["tcp://localhost:9614"]
-      traffic_manager_auth_urls = ["ssl://localhost:9714"]
+      traffic_manager_urls = ["tcp://kcb-wso2am-tm-service:9614"]
+      traffic_manager_auth_urls = ["ssl://kcb-wso2am-tm-service:9714"]

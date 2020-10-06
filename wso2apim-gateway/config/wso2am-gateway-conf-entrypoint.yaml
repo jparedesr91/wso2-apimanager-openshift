@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: wso2apim-gateway-conf-entrypoint
-  namespace: wso2apim
+  name: kcb-wso2apim-gateway-conf-entrypoint
+  namespace: kcb-wso2apim
 data:
   docker-entrypoint.sh: |
     #!/bin/bash

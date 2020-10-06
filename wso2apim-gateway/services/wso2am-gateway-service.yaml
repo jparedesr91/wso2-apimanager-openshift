@@ -2,21 +2,21 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: wso2apim-gateway-service
-  namespace: wso2apim
+  name: kcb-wso2apim-gateway-service
+  namespace: kcb-wso2apim
 spec:  
   ports:
-    - name: pass-through-http
+    - name: kcb-pass-through-http
       protocol: TCP
       port: 8284
-    - name: pass-through-https
+    - name: kcb-pass-through-https
       protocol: TCP
       port: 8247
-    - name: servlet-http
+    - name: kcb-servlet-http
       protocol: TCP
       port: 9767
-    - name: servlet-https
+    - name: kcb-servlet-https
       protocol: TCP
       port: 9447
   selector:
-    deploymentName: wso2apim-gateway
+    deploymentName: kcb-wso2apim-gateway

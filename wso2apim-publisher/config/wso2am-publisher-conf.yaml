@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: wso2apim-publisher-conf
-  namespace : wso2apim  
+  name: kcb-wso2apim-publisher-conf
+  namespace : kcb-wso2apim  
 data:
   deployment.toml: |-
     [server]
@@ -22,7 +22,7 @@ data:
 
     [database.apim_db]
     type = "mysql"
-    url = "jdbc:mysql://wso2am-mysql-db-service:3306/WSO2AM_DB?useSSL=false&amp;autoReconnect=true&amp;requireSSL=false&amp;verifyServerCertificate=false"
+    url = "jdbc:mysql://kcb-wso2am-mysql-db-service:3306/WSO2AM_DB?useSSL=false&amp;autoReconnect=true&amp;requireSSL=false&amp;verifyServerCertificate=false"
     username = "wso2carbon"
     password = "wso2carbon"
     driver = "com.mysql.cj.jdbc.Driver"
@@ -30,7 +30,7 @@ data:
 
     [database.shared_db]
     type = "mysql"
-    url = "jdbc:mysql://wso2am-mysql-db-service:3306/WSO2AM_SHARED_DB?useSSL=false&amp;autoReconnect=true&amp;requireSSL=false&amp;verifyServerCertificate=false"
+    url = "jdbc:mysql://kcb-wso2am-mysql-db-service:3306/WSO2AM_SHARED_DB?useSSL=false&amp;autoReconnect=true&amp;requireSSL=false&amp;verifyServerCertificate=false"
     username = "wso2carbon"
     password = "wso2carbon"
     driver = "com.mysql.cj.jdbc.Driver"
@@ -53,13 +53,13 @@ data:
     type= "hybrid"
     display_in_api_console= true
     description= "This is a hybrid gateway that handles both production and sandbox token traffic."
-    service_url= "https://wso2apim-gateway-service:9447/services/"
+    service_url= "https://kcb-wso2apim-gateway-service:9447/services/"
     username= "${admin.username}"
     password= "${admin.password}"
-    ws_endpoint = "ws://lowso2apim-gateway-service:9103"
-    wss_endpoint = "wss://wso2apim-gateway-service:8103"
-    http_endpoint = "http://wso2apim-gateway-service:8284/"
-    https_endpoint = "https://wso2apim-gateway-service:8247/"        
+    ws_endpoint = "ws://kcb-wso2apim-gateway-service:9103"
+    wss_endpoint = "wss://kcb-wso2apim-gateway-service:8103"
+    http_endpoint = "http://kcb-wso2apim-gateway-service:8284/"
+    https_endpoint = "https://kcb-wso2apim-gateway-service:8247/"        
 
     # key manager implementation
     [apim.key_manager]

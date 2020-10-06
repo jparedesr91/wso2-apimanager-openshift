@@ -1,24 +1,24 @@
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
-  name: wso2apim-devportal-deployment
-  namespace: wso2apim  
+  name: kcb-wso2apim-devportal-deployment
+  namespace: kcb-wso2apim  
 spec:
   replicas: 1
   strategy:
     type: Rolling
   selector:
-      deploymentName: wso2apim-devportal          
+      deploymentName: kcb-wso2apim-devportal          
   template:
     metadata:     
       labels:
-        deploymentName: wso2apim-devportal
+        deploymentName: kcb-wso2apim-devportal
     spec:
       initContainers:        
         - name: init-apim-db
           image: busybox:1.32
           imagePullPolicy: IfNotPresent
-          command: ['sh', '-c', 'echo -e "Checking for the availability of DBMS service"; while ! nc -z "wso2am-mysql-db-service" 3306; do sleep 1; printf "-"; done; echo -e "  >> DBMS service is available";']
+          command: ['sh', '-c', 'echo -e "Checking for the availability of DBMS service"; while ! nc -z "kcb-wso2am-mysql-db-service" 3306; do sleep 1; printf "-"; done; echo -e "  >> DBMS service is available";']
         - name: init-mysql-connector-download
           image: busybox:1.32
           imagePullPolicy: IfNotPresent
@@ -33,7 +33,7 @@ spec:
             - name: mysql-connector-jar
               mountPath: /mysql-connector-jar        
       containers:
-        - name: wso2apim-devportal          
+        - name: kcb-wso2apim-devportal          
           image: 'wso2/wso2am:3.1.0'          
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -57,12 +57,12 @@ spec:
               exec:
                 command: ['sh', '-c', '${WSO2_SERVER_HOME}/bin/wso2server.sh stop']
           resources:
-            requests:
-              memory: 2Gi
-              cpu: 700m
-            limits:
-              memory: 2Gi
-              cpu: 700m
+            # requests:
+            #   memory: 2Gi
+            #   cpu: 700m
+            # limits:
+            #   memory: 2Gi
+            #   cpu: 700m
           ports:
             - containerPort: 9765
               protocol: "TCP"
@@ -80,27 +80,27 @@ spec:
           securityContext:
             runAsUser: 802
           volumeMounts:
-          - name: wso2apim-devportal-conf
+          - name: kcb-wso2apim-devportal-conf
             mountPath: /home/wso2carbon/wso2-config-volume/repository/conf         
           # - name: wso2apim-devportal-local-carbon-database-storage
           #   mountPath: /home/wso2carbon/solr/database
           # - name: wso2apim-devportal-indexed-data-volume
           #   mountPath: /home/wso2carbon/solr/indexed-data
-          - name: wso2apim-devportal-conf-entrypoint
+          - name: kcb-wso2apim-devportal-conf-entrypoint
             mountPath: /home/wso2carbon/docker-entrypoint.sh
             subPath: docker-entrypoint.sh
-          - name: mysql-connector-jar
+          - name: kcb-mysql-connector-jar
             mountPath: /home/wso2carbon/wso2-artifact-volume/repository/components/dropins                   
-      serviceAccountName: wso2am-svc-account
+      serviceAccountName: kcb-wso2am-svc-account
       imagePullSecrets:
         - name: ""
       volumes:
-        - name: wso2apim-devportal-conf
+        - name: kcb-wso2apim-devportal-conf
           configMap:
-            name: wso2apim-devportal-conf        
-        - name: wso2apim-devportal-conf-entrypoint
+            name: kcb-wso2apim-devportal-conf        
+        - name: kcb-wso2apim-devportal-conf-entrypoint
           configMap:
-            name: wso2apim-devportal-conf-entrypoint
+            name: kcb-wso2apim-devportal-conf-entrypoint
             defaultMode: 0407
         # - name: wso2apim-devportal-local-carbon-database-storage
         #   persistentVolumeClaim:
@@ -108,7 +108,7 @@ spec:
         # - name: wso2apim-devportal-indexed-data-volume
         #   persistentVolumeClaim:
         #     claimName: wso2apim-devportal-solr-indexed-data-volume-claim 
-        - name: mysql-connector-jar
+        - name: kcb-mysql-connector-jar
           emptyDir: {}  
   triggers:
       - type: ConfigChange    

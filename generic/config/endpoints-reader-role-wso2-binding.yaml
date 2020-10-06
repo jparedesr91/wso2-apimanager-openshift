@@ -3,13 +3,14 @@ apiVersion: authorization.openshift.io/v1
 groupNames: null
 kind: RoleBinding
 metadata:
-  name: endpoints-reader-role-wso2-binding
+  name: kcb-endpoints-reader-role-wso2-binding
+  namespace: kcb-wso2apim
 roleRef:
   name: endpoints-reader-role
-  namespace: wso2apim
+  namespace: kcb-wso2apim
 subjects:
 - kind: ServiceAccount
-  name: wso2am-svc-account
-  namespace: wso2apim
+  name: kcb-wso2am-svc-account
+  namespace: kcb-wso2apim
 userNames:
-- system:serviceaccount:wso2apim:wso2am-svc-account
+- system:serviceaccount:kcb-wso2apim:kcb-wso2am-svc-account
